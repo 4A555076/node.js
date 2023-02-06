@@ -13,9 +13,11 @@
             <th scope="col">手機</th>
             <th scope="col">生日</th>
             <th scope="col">地址</th>
-            <th scope="col">寵物種類</th>
             <th scope="col">會員狀態</th>
             <th scope="col">創立時間</th>
+            <th scope="col">刪除</th>
+            <th scope="col">修改</th>
+            <th scope="col"><i class="fa-solid fa-paw"></i></th>
           </tr>
         </thead>
         <tbody>
@@ -27,8 +29,7 @@
             <td><%=s.mobile %></td>
             <td><%=s.birthday %></td>
             <td><%=s.address %></td>
-            <td><%=s.pet_type %></td>
-            <td><%=s.member_status %></td>
+            <td><%=s.member_status==1 ? '正常' :'停權' %></td>
             <td><%=s.created_at %></td>
           </tr>
           <% } %>
