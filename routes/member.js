@@ -82,7 +82,7 @@ router.get('/add', async(req, res)=>{
     req.session.lastPage = res.originalUrl;
     return res.redirect('/login');
   }
-  res.render('m-add');
+  res.render('admin-add');
 });
 
 router.post('/add', upload.none(), async(req, res)=>{ 
@@ -131,7 +131,7 @@ router.get('/edit/:mid', async(req, res)=>{
 
   //從哪邊來
   const referer = req.get('Referer') || req.baseUrl; //若沒有值->回到baseUrl ->第一頁
-  res.render('m-edit', {...row, referer});  //展開->email、name..這些變數 
+  res.render('admin-edit', {...row, referer});  //展開->email、name..這些變數 
 });
 //http方法->使用put;  RESTful API 基本規定-> CRUD -> get/ post / 修改:put / delete
 router.put('/edit/:mid', upload.none(), async(req, res)=>{ 
@@ -213,7 +213,8 @@ router.put('/edit/:mid/:pet_id', upload.none(), async(req, res)=>{
 
   //TODO: 資料檢查
     // const sql = "UPDATE `member`,`pet` INNER JOIN ON `pet` ON member.pet_id = pet.pet_id SET `name`=?,`type`=?,`gender`=?,`birthday`=? WHERE `member.pet_id`=?";
-    const sql = "UPDATE `pet` SET `name`=?, `birthday`=?, `type`=?, `gender`=? WHERE `pet_id`=?";
+    // const sql = "UPDATE `pet` SET `name`=?,`birthday`=?,`type`=?,`gender`=? WHERE `pet_id`=?";
+    const sql = "UPDATE `pet` SET `name`=?,`type`=?,`gender`=?,`birthday`=? WHERE `pet_id`=?";
   const [result] = await db.query(sql, [name, type, gender, birthday, pet_id]);
 
   output.result = result; 
