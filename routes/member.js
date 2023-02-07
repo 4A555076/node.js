@@ -115,45 +115,6 @@ router.post('/add', upload.none(), async(req, res)=>{
   //upload.none()->不要上傳，但需要middleware幫忙解析資料
 });
 
-//註冊
-// router.get('/register', async(req, res)=>{ 
-//   // //如果沒有登入，就看不到新增會員資料的表單
-//   // if(!req.session.user){
-//   //   req.session.lastPage = res.originalUrl;
-//   //   return res.redirect('/login');
-//   // }
-//   res.render('m-register');
-// });
-
-// router.post('/register', upload.none(), async(req, res)=>{ 
-//   const output = {
-//     success:false,
-//     postData: req.body, //除錯用
-//     code:0,
-//     errors: {}
-//   };
-
-//   let {name,email,mobile,birthday,address}=req.body; //解構
-
-//   if(!name || name.length<2 ){
-//     output.errors.name='請輸入正確的姓名';
-//     return res.json(output);   //輸出，但後面不執行時->加return
-//   }
-  
-//   birthday = moment(birthday);
-//   birthday = birthday.isValid() ? birthday.format('YYYY-MM-DD') : null;   //如果格式錯誤，填空值
-
-//   //TODO: 資料檢查
-//     const sql = "INSERT INTO `member`(`name`, `email`,`mobile`, `birthday`, `address`,`created_at`)VALUES(?, ?, ?, ?, ?, ?,NOW())";
-//   const [result] = await db.query(sql, [name, email , mobile, birthday, address]);
-
-//   output.result = result; 
-//   output.success = !!result.affectedRows; //轉成boolean (affectedRows 1 : true ; affectedRows 0 :false )
-  
-//   //affectedRows
-//   res.json(output);   //=>結束，所以不須加return                   
-//   //upload.none()->不要上傳，但需要middleware幫忙解析資料
-// });
 
 router.get('/edit/:mid', async(req, res)=>{ 
   const mid = +req.params.mid || 0; //轉換成數值
@@ -199,6 +160,61 @@ router.put('/edit/:mid', upload.none(), async(req, res)=>{
   //TODO: 資料檢查
     const sql = "UPDATE `member` SET `name`=?,`email`=?,`mobile`=?,`birthday`=?,`address`=?,`member_status`=? WHERE `mid`=?";
   const [result] = await db.query(sql, [name, email, mobile, birthday, address, member_status, mid]);
+
+  output.result = result; 
+  output.success = !!result.changedRows; //轉成boolean (changedRows 1 : true ; changedRows 0 :false )
+  
+ 
+  res.json(output);   //=>結束，所以不須加return                   
+  //upload.none()->不要上傳，但需要middleware幫忙解析資料
+});
+
+router.get('/edit/:mid/:pet_id', async(req, res)=>{ 
+  const pet_id = +req.params.pet_id || 0; //轉換成數值
+  if(!pet_id){
+    return res.redirect(req.baseUrl); //呈現表單-> 轉向列表頁(不要用json)
+  }
+  // const sql = "SELECT member.mid, pet.name FROM `member` INNER JOIN `pet` ON member.pet_id = pet.pet_id";
+  const sql = "SELECT * FROM pet WHERE pet_id=?";
+  const [rows] = await db.query(sql,[pet_id]);
+  if(rows.length<1){
+    return res.redirect(req.baseUrl); //轉向列表頁
+  }
+  const row = rows[0];  //若有資料就拿第一筆資料
+  // res.json(row);
+
+  //從哪邊來
+  const referer = req.get('Referer') || req.baseUrl; //若沒有值->回到baseUrl ->第一頁
+  res.render('pet-edit', {...row, referer});  //展開->email、name..這些變數 
+});
+//http方法->使用put;  RESTful API 基本規定-> CRUD -> get/ post / 修改:put / delete
+router.put('/edit/:mid/:pet_id', upload.none(), async(req, res)=>{ 
+  const output = {   //定義要輸出資訊的格式
+    success:false,
+    postData: req.body, //除錯用
+    code:0,
+    errors: {}
+  };
+  const pet_id = +req.params.pet_id || 0; //轉換成數值
+  if(!pet_id){
+    output.errors.pet_id='沒有寵物資料編號'
+    return res.json(output); //回傳錯誤訊息-> json(API不要用轉向->會將列表頁內容傳給前端)
+  }
+
+  let {name,type, gender, birthday}=req.body; //解構
+
+  if(!name || name.length<2 ){
+    output.errors.name='請輸入正確的姓名';
+    return res.json(output);   //輸出，但後面不執行時->加return
+  }
+  
+  birthday = moment(birthday);
+  birthday = birthday.isValid() ? birthday.format('YYYY-MM-DD') : null;   //如果格式錯誤，填空值
+
+  //TODO: 資料檢查
+    // const sql = "UPDATE `member`,`pet` INNER JOIN ON `pet` ON member.pet_id = pet.pet_id SET `name`=?,`type`=?,`gender`=?,`birthday`=? WHERE `member.pet_id`=?";
+    const sql = "UPDATE `pet` SET `name`=?, `birthday`=?, `type`=?, `gender`=? WHERE `pet_id`=?";
+  const [result] = await db.query(sql, [name, type, gender, birthday, pet_id]);
 
   output.result = result; 
   output.success = !!result.changedRows; //轉成boolean (changedRows 1 : true ; changedRows 0 :false )
