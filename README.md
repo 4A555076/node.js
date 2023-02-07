@@ -28,4 +28,6 @@ ISpan129FE-team01-後端(node.js)
     
     "mysql2": "^3.0.1",
     
+    "nodemailer": "^6.9.1",
+    
     "uuid": "^9.0.0"
