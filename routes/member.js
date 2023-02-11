@@ -12,6 +12,7 @@ router.use((req, res, next)=>{
   const{url, baseUrl, originalUrl} = req;
   res.locals={...res.locals,url, baseUrl, originalUrl};
   //不能使用-> res.locals.url = url (會將先前在index設定的middleware排除)
+  
   //都要先經過登入才可以看=>擋住所有路由
   // if(!req.session.user){
   //   req.session.lastPage = res.originalUrl;
@@ -20,7 +21,7 @@ router.use((req, res, next)=>{
   next();
 });
 
-//呈現新增表單
+//呈現會員表單(m-list)
 const getListData = async(req, res)=>{ 
   let page = +req.query.page || 1;
   //用戶想要看第幾頁 //加號->轉換成數值
@@ -73,52 +74,9 @@ const getListData = async(req, res)=>{
   }
 
   return  {totalRows, totalPages, page, rows};
-
 };
-//呈現寵物表單
-// const getPetListData = async(req, res)=>{ 
-//   let page = +req.query.page || 1;
-//   //用戶想要看第幾頁 //加號->轉換成數值
 
-//   if(page<1){
-//     return res.redirect(req.baseUrl+trq.url); //頁面轉向
-//   }
-//   let where  = ' WHERE 1 ';   //1 = 相當於true
-
-//   //搜尋功能
-//   let search = req.query.search || '';
-//   let orderby = req.query.orderby || '';
-
-//   if(search){
-//     const esc_search = db.escape(`%${search}%`);  // SQL 跳脫單引號, 避免 SQL injection ; 頭尾加%
-//     console.log({esc_search});
-//     where += ` AND (\`type\` LIKE ${esc_search} OR \`gender\` LIKE ${esc_search} OR \`birthday\` LIKE ${esc_search})`;  //頭尾給空格
-//   }
-
-//   const perPage = 20;
-//   const t_sql = `SELECT COUNT(1) totalRows FROM pet ${where}` ;  //總筆數
-//   const [[{totalRows}]] = await db.query(t_sql);  //解構
-//   const totalPages = Math.ceil(totalRows/perPage);  //總頁數
-
-//   let rows = [];
-//   if(totalRows>0){
-//     if(page>totalPages){
-//       return res.redirect("?page="+ totalPages); //如果超過頁面，轉到最後一頁
-//     }
-
-//     const sql = `SELECT * FROM pet ${where} LIMIT ${(page-1)*perPage}, ${perPage}`;
-
-//     // return res.send(sql); 輸出sql至頁面，除錯用
-//     [rows] = await db.query(sql);
-
-
-//   }
-
-//   return  {totalRows, totalPages, page, rows};
-
-// };
-
-//新增api
+//新增會員api
 router.get('/add', async(req, res)=>{ 
   //如果沒有登入，就看不到新增會員資料的表單
   if(!req.session.user){
@@ -158,6 +116,7 @@ router.post('/add', upload.none(), async(req, res)=>{
   //upload.none()->不要上傳，但需要middleware幫忙解析資料
 });
 
+//新增寵物api
 router.get('/addPet/:mid', async(req, res)=>{ 
   //如果沒有登入，就看不到新增寵物資料的表單
   if(!req.session.user){
@@ -197,7 +156,7 @@ router.post('/addPet/:mid', upload.none(), async(req, res)=>{
   //upload.none()->不要上傳，但需要middleware幫忙解析資料
 });
 
-
+//編輯會員api
 router.get('/edit/:mid', async(req, res)=>{ 
   const mid = +req.params.mid || 0; //轉換成數值
   if(!mid){
@@ -253,13 +212,15 @@ router.put('/edit/:mid', upload.none(), async(req, res)=>{
 
 //查看每位會員的各自寵物資訊
 router.get('/pet-list/:mid', async(req, res)=>{ 
-  const pet_id = +req.params.pet_id || 0; //轉換成數值
-  if(!pet_id){
+  const mid = +req.params.mid || 0; //轉換成數值
+  if(!mid){
     return res.redirect(req.baseUrl); //呈現表單-> 轉向列表頁(不要用json)
   }
-  const sql = "SELECT m.name AS 'mName', pet.* FROM pet JOIN member AS m ON p.mid=m.mid WHERE pet_id=?";
-  // const sql = "SELECT pet.* FROM pet JOIN member ON pet.mid=member.mid 
-  const [rows] = await db.query(sql,[pet_id]);
+  // const sql = "SELECT m.name AS 'mName', pet.* FROM pet JOIN member AS m ON p.mid=m.mid WHERE pet_id=?";
+  // const sql = "SELECT * FROM pet WHERE mid=?";
+  //從資料庫抓會員名稱與他們所擁有的寵物資訊
+  const sql = "SELECT m.name AS 'mName', pet.* FROM pet JOIN member AS m ON pet.mid=m.mid WHERE pet.mid=?";
+  const [rows] = await db.query(sql,[mid]);
   if(rows.length<1){
     return res.redirect(req.baseUrl); //轉向列表頁
   }
@@ -272,12 +233,11 @@ router.get('/pet-list/:mid', async(req, res)=>{
 
 //http方法->使用put;  RESTful API 基本規定-> CRUD -> get/ post / 修改:put / delete
 
-
+//呈現會員表單(搭配getListData)
 router.get('/', async(req, res)=>{ 
   const output = await getListData(req, res); //output
   res.render('m-list', output);
 });
-
 
 
 router.get('/api', async(req, res)=>{ 
@@ -290,6 +250,7 @@ router.get('/api', async(req, res)=>{
   res.json(output); //拿到路由-> 轉成json
 });
 
+//刪除會員api
 router.delete('/:mid', async(req, res)=>{ 
   const output = {
     success:false,
