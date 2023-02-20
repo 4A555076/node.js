@@ -282,6 +282,7 @@ app.get('/fake1', async (req, res)=>{
 
 //baseUrl
 app.use('/member', require('./routes/member'));
+app.use('/activity',require('./routes/activity'))
 
 app.use(express.static('public'));
 //*****所有路由設定都要放在這行之前*****
