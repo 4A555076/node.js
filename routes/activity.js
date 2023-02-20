@@ -19,14 +19,6 @@ router.use((req,res,next)=>{
 
     next();
 });
-db.activitypettype.hasMany(db.activity,{
-    foreignKey:'activity_pettype',
-    as:'activity'
-})
-db.activity.belongsTo(db.activitypettype,{
-    foreignKey:'activity_pettype',
-    as:'activitypettype'
-})
 
 const getListData = async(req,res)=>{
 
@@ -164,9 +156,7 @@ router.put("/edit/:activity_id",upload.none(),async(req,res)=>{
         return res.json(output);
     }
 
-     const sql = "UPDATE `activity` SET `activity_name`=?,`activity_datestart`=?,`activity_dateend`=?,`activity_pettype`=?,`activity_location`=?,`activity_decription`=?,`activity_notice`=? WHERE `activity_id`=?";
-
-    // const sql = "UPDATE `activity` SET `activity_name`=?,`activity_datestart`=?,`activity_dateend`=?,`activity_pettype`=?,`activity_location`=?,`activity_decription`=?,`activity_notice`=? WHERE `activity_id`=?";
+    const sql = "UPDATE `activity` SET `activity_name`=?,`activity_datestart`=?,`activity_dateend`=?,`activity_pettype`=?,`activity_location`=?,`activity_decription`=?,`activity_notice`=? WHERE `activity_id`=?";
 
     const [result] = await db.query(sql,[activity_name,activity_datestart,activity_dateend,activity_pettype,activity_location,activity_decription,activity_notice,activity_id])
 
