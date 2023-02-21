@@ -2,6 +2,7 @@ const express = require('express');
 const db = require('../modules/connect-mysql');
 const upload = require('../modules/upload-img');
 const moment = require('moment-timezone');
+const bcrypt = require('bcryptjs')
 
 
 const router = express.Router();
@@ -168,11 +169,11 @@ router.get('/edit/:mid', async(req, res)=>{
     return res.redirect(req.baseUrl); //轉向列表頁
   }
   const row = rows[0];  //若有資料就拿第一筆資料
-  // res.json(row);
+  res.json(row);
 
   //從哪邊來
-  const referer = req.get('Referer') || req.baseUrl; //若沒有值->回到baseUrl ->第一頁
-  res.render('admin-edit', {...row, referer});  //展開->email、name..這些變數 
+  // const referer = req.get('Referer') || req.baseUrl; //若沒有值->回到baseUrl ->第一頁
+  // res.render('admin-edit', {...row, referer});  //展開->email、name..這些變數 
 });
 //http方法->使用put;  RESTful API 基本規定-> CRUD -> get/ post / 修改:put / delete
 router.put('/edit/:mid', upload.none(), async(req, res)=>{ 
@@ -189,7 +190,7 @@ router.put('/edit/:mid', upload.none(), async(req, res)=>{
   }
 
   let {name,email,mobile,birthday,address,member_status}=req.body; //解構
-
+  console.log('name', req.body)
   if(!name || name.length<2 ){
     output.errors.name='請輸入正確的姓名';
     return res.json(output);   //輸出，但後面不執行時->加return
@@ -207,6 +208,69 @@ router.put('/edit/:mid', upload.none(), async(req, res)=>{
   
  
   res.json(output);   //=>結束，所以不須加return                   
+  //upload.none()->不要上傳，但需要middleware幫忙解析資料
+});
+
+//登入後點選更新密碼
+router.get('/changePassword/:mid', async(req, res)=>{ 
+  const mid = +req.params.mid || 0; //轉換成數值
+  if(!mid){
+    return res.redirect(req.baseUrl); //呈現表單-> 轉向列表頁(不要用json)
+  }
+  const sql = "SELECT * FROM member WHERE mid=?";
+  const [rows] = await db.query(sql,[mid]);
+  if(rows.length<1){
+    return res.redirect(req.baseUrl); //轉向列表頁
+  }
+  const row = rows[0];  //若有資料就拿第一筆資料
+  res.json(row);
+
+  //從哪邊來
+  // const referer = req.get('Referer') || req.baseUrl; //若沒有值->回到baseUrl ->第一頁
+  // res.render('admin-edit', {...row, referer});  //展開->email、name..這些變數 
+});
+
+router.put('/changePassword/:mid', upload.none(), async(req, res)=>{ 
+  const output = {   //定義要輸出資訊的格式
+    success:false,
+    postData: req.body, //除錯用
+    code:0,
+    errors: {}
+  };
+  const mid = +req.params.mid || 0; //轉換成數值
+  if(!mid){
+    output.errors.mid='沒有會員資料編號'
+    return res.json(output); //回傳錯誤訊息-> json(API不要用轉向->會將列表頁內容傳給前端)
+  }
+
+  let {password,password2}=req.body; //解構
+  // console.log('name', req.body)
+  // if(!name || name.length<1 ){
+  //   output.errors.name='請輸入正確的姓名';
+  //   return res.json(output);   //輸出，但後面不執行時->加return
+  // }
+  
+  // birthday = moment(birthday);
+  // birthday = birthday.isValid() ? birthday.format('YYYY-MM-DD') : null;   //如果格式錯誤，填空值
+
+  //TODO: 資料檢查
+  //先將密碼加密->更新進資料庫
+  let hashedPassword = await bcrypt.hash(password, 10)
+  const sql = "UPDATE `member` SET `password`=? WHERE `mid`=?";
+  const [result] = await db.query(sql, [hashedPassword, mid]);
+
+  if(password !== password2) {
+    output.error = '密碼不一致!'
+    return res.json(output)
+  }
+
+  console.log(hashedPassword);
+
+  output.result = result; 
+  output.success = !!result.affectedRows; //轉成boolean (changedRows 1 : true ; changedRows 0 :false )
+  
+ 
+  res.json({...output,message:'密碼重設成功'})//=>結束，所以不須加return                   
   //upload.none()->不要上傳，但需要middleware幫忙解析資料
 });
 
