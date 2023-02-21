@@ -1,0 +1,91 @@
+<%- include('parts/html-head') %>
+<%- include('parts/navbar') %>
+
+<div class="container">
+  <div class="row">
+    <div class="col-6">
+      <div class="card" >
+        <div class="card-body">
+          <h5 class="card-title">修改商品資料</h5>
+          <form name="form1" onsubmit="sendForm(event)">
+            <div class="mb-3">
+              <label for="product_type" class="form-label">分類</label>
+              <select name="product_type" id="product_type" class="form-select">
+                <option value="1" <%= "product_type" == 1 ? 'selected' : '' %>>商品</option>
+                <option value="2" <%= "product_type" == 2 ? 'selected' : '' %>>課程</option>
+                <option value="3" <%= "product_type" == 3 ? 'selected' : '' %>>住宿</option>
+                <option value="4" <%= "product_type" == 4 ? 'selected' : '' %>>餐點</option>
+                <option value="4" <%= "product_type" == 5 ? 'selected' : '' %>>活動</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="product_name" class="form-label">商品名稱 </label>
+              <input type="text" class="form-control" id="product_name" name="product_name" value="<%= product_name %>">
+              <div class="form-text"></div>
+            </div>
+            <div class="mb-3">
+              <label for="product_class" class="form-label">商品類型</label>
+              <input type="text" class="form-control" id="product_class" name="product_class" value="<%= product_class %>">
+              <div class="form-text"></div>
+            </div>
+            <div class="mb-3">
+              <label for="products_price" class="form-label">商品價格</label>
+              <input type="number" class="form-control" id="products_price" name="products_price" value="<%= products_price %>">
+              <div class="form-text"></div>
+            </div>
+            <div class="mb-3">
+              <label for="products_descripttion" class="form-label">商品說明 </label>
+              <textarea  class="form-control" id="products_descripttion" name="products_descripttion" cols="30" rows="6"><%= products_descripttion%></textarea>
+              <!-- <textarea  class="form-control" id="products_descripttion2" name="products_descripttion" cols="30" rows="6"><%= products_descripttion%></textarea> -->
+              <div class="form-text"></div>
+            </div>
+             <div class="mb-3">
+              <label for="products_unit" class="form-label">販售單位</label>
+              <input type="text" class="form-control" id="products_unit" name="products_unit" value="<%= products_unit %>">
+              <div class="form-text"></div>
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <input type="button" class="btn btn-primary me-md-2" onclick="history.back();" value="返回">
+              <button type="submit" class="btn btn-primary">送出</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('parts/scripts') %>
+<script>
+  const referer = <%- JSON.stringify(referer)%>
+  const locals = <%- JSON.stringify(locals)%> 
+  // const productsDescripttion1 = document.getElementById('products_descripttion1').value
+  // const productsDescripttion2 = document.getElementById('products_descripttion2').value
+  // const productsDescripttion = `<p>${productsDescripttion1}</p><p>${productsDescripttion2}</p>`
+
+  function sendForm(event){
+    event.preventDefault();
+
+    //TODO: 資料檢查
+    const fd = new FormData(document.form1);
+    fetch('',{    //('')空字串-> 代表路徑url與原本的路徑url相同
+      method:'PUT',
+      body: fd
+    })
+      .then(r=>r.json())
+      .then(data=>{
+        console.log(data);
+        if(data.success){
+          alert('修改成功');
+          location.href = referer;
+        }else{
+          alert('資料沒有修改');
+        }
+      });
+
+
+  }
+
+
+</script>
+<%- include('parts/html-foot') %>

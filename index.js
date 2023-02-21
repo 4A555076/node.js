@@ -368,7 +368,8 @@ app.post('/reset-password',async(req,res)=>{
 
 //baseUrl
 app.use('/member', require('./routes/member'));
-app.use('/activity',require('./routes/activity'))
+app.use('/activity',require('./routes/activity'));
+app.use('/product',require('./routes/product'));
 
 app.use(express.static('public'));
 //*****所有路由設定都要放在這行之前*****
