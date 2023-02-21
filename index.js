@@ -8,6 +8,8 @@ const bcrypt = require('bcryptjs')
 const multer = require('multer');
 const upload = require('./modules/upload-img');
 const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+const jwt = require("jsonwebtoken");
 const session = require('express-session');  //session 放最前面(注意順序!)
 const MYsqlStore = require('express-mysql-session')(session);
 const moment = require('moment-timezone');
@@ -242,6 +244,7 @@ app.post('/login', upload.none(), async (req, res)=>{
   //   output.code = 200;
   //   return res.json(output);
   // }
+  // output.id =id;
   output.email= email;
   const sql = "SELECT * FROM  member WHERE email =?";
   const [rows] = await db.query(sql,[email]); //上方的? => [email]
@@ -256,9 +259,10 @@ app.post('/login', upload.none(), async (req, res)=>{
    const result = await bcrypt.compare(password,row.password);
    if(result){
     output.success = true;
+    output.id = row.mid;
     //成功登入->設定session
     req.session.user={
-      id:row.id,
+      id:row.mid,
       email,  //=>[email]
       name : row.name
     };
@@ -286,6 +290,81 @@ app.get('/fake1', async (req, res)=>{
   };
   return res.redirect('/');  //轉向首頁
 });
+
+//忘記密碼
+app.post('/forget-password',async(req,res)=>{
+  const {email} = req.body;
+  
+  const token = crypto.randomBytes(20).toString('hex');
+  
+  //nodemailer
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth:{
+      user:'testerforispanproject@gmail.com',
+      pass:'hjpucggdagcfnvws'
+    },
+    tls: {
+      rejectUnauthorized: false
+    }
+  });
+
+  await transporter.sendMail({
+    from:'testerforispanproject@gmail.com',
+    to:email,
+    subject:'重設密碼',
+    text:`點擊下方連結即可重設密碼:http://localhost:3000/ResetPassword?email=${email}&token=${token}`
+  })
+  res.json({message:'重設密碼信已寄出!'})
+})
+
+//重設密碼
+app.post('/reset-password',async(req,res)=>{
+  const output = {   //定義要輸出資訊的格式
+    success:false,
+    postData: req.query, //除錯用
+    postData2: req.body, //除錯用
+    code:0,
+    errors: {}
+  };
+
+  // return res.json(output)
+  const{token, email} = req.query;
+  const {password, password2} = req.body;
+  if(!token || !password || !password2){
+    return res.status(400).json({...output, message:'token and password are required'})
+  }
+  
+  // const user = await user.findOne({resetToken:token});
+  // if(!user){
+  //   return res.status(400).json({message:'Invalid Token'})
+  // }
+  
+  let hashedPassword = await bcrypt.hash(password, 10)
+    const sql = "UPDATE `member` SET `password`=? WHERE `email`=?";
+    const [result] = await db.query(sql, [hashedPassword, email]);
+
+    if(password !== password2) {
+      output.error = '密碼不一致!'
+      return res.json(output)
+    }
+    // let hashedPassword = await bcrypt.hash(password, 10)
+
+  console.log(hashedPassword);
+
+  output.result = result; 
+  output.success = !!result.affectedRows; //轉成boolean (changedRows 1 : true ; changedRows 0 :false )
+  
+ 
+  // res.json(output);   //=>結束，所以不須加return   
+  // user.password = password;
+  // user.resetToken = null;
+  // await user.save();
+
+
+  res.json({...output,message:'密碼重設成功'})
+
+})
 
 //baseUrl
 app.use('/member', require('./routes/member'));
