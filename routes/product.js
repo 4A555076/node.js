@@ -162,6 +162,19 @@ router.get("/api",async(req,res)=>{
     res.json(output);
 });
 
+router.get("/list-product/:product_type",async(req,res)=>{
+
+    const product_type = +req.params.product_type || 0;
+    if(!product_type){
+        return res.redirect(req.baseUrl); //轉向到列表頁
+    }
+
+    const sql = "SELECT * FROM products WHERE product_type=?";
+    const [rows] = await db.query(sql,[product_type]);
+    res.json(rows);
+
+})
+
 router.delete("/:product_id",async(req,res)=>{
     const output = {
         success:false,
