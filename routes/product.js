@@ -59,9 +59,8 @@ const getListData = async(req,res)=>{
         if(page>totalPages){
             return res.redirect("?page="+totalPages);  //頁面轉向到最後一頁
         }
-        // const sql = `SELECT * FROM products ${where} ${orderbySQL} LIMIT ${(page-1)*perPage},${perPage}`;
-        const sql = `SELECT product_type.* , products.* FROM  products JOIN product_type ON product.type_id=product_type.type_id ${where} ${orderbySQL} LIMIT ${(page-1)*perPage},${perPage}`;
-        // SELECT activitypettype.* , activity.* FROM `activity` JOIN `activitypettype` ON activity.activity_pettype=activitypettype.activity_pettype WHERE activity_id=1;
+
+        const sql = `SELECT product_type.* , products.* FROM  products JOIN product_type ON products.product_type=product_type.type_id ${where} ${orderbySQL} LIMIT ${(page-1)*perPage},${perPage}`;
         [rows] = await db.query(sql);
     }
 
