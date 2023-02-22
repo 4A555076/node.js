@@ -31,3 +31,5 @@ ISpan129FE-team01-後端(node.js)
     "nodemailer": "^6.9.1",
     
     "uuid": "^9.0.0"
+    
+    "jsonwebtoken": "^9.0.0",
