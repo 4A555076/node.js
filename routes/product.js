@@ -12,10 +12,10 @@ router.use((req,res,next)=>{
 
     res.locals = {...res.locals,url,baseUrl,originalUrl};
     //不能使用-> res.locals.url = url (會將先前在index設定的middleware排除)
-    if(! req.session.user){  //如果沒有登入會員,就看不到新增會員表單
-        req.session.lastPage = req.originalUrl;  
-        return res.redirect('/login');
-    }
+    // if(! req.session.user){  //如果沒有登入會員,就看不到新增會員表單
+    //     req.session.lastPage = req.originalUrl;  
+    //     return res.redirect('/login');
+    // }
 
     next();
 });
@@ -171,6 +171,19 @@ router.get("/list-product/:product_type",async(req,res)=>{
 
     const sql = "SELECT * FROM products WHERE product_type=?";
     const [rows] = await db.query(sql,[product_type]);
+    res.json(rows);
+
+})
+
+router.get("/list-detail/:product_id",async(req,res)=>{
+
+    const product_id = +req.params.product_id || 0;
+    if(!product_id){
+        return res.redirect(req.baseUrl); //轉向到列表頁
+    }
+
+    const sql = "SELECT * FROM products WHERE product_id=?";
+    const [rows] = await db.query(sql,[product_id]);
     res.json(rows);
 
 })
