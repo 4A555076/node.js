@@ -44,6 +44,11 @@
               <input type="text" class="form-control" id="products_unit" name="products_unit" value="<%= products_unit %>">
               <div class="form-text"></div>
             </div>
+            <div class="mb-3">
+              <label for="product_image" class="product_image">選擇圖片</label>
+              <input type="file" class="form-control" id="product_image" name="product_image">
+              <img src="/<%= product_image %>" width="200" class="product_image mt-3">
+            </div>
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
               <input type="button" class="btn btn-primary me-md-2" onclick="history.back();" value="返回">
               <button type="submit" class="btn btn-primary">送出</button>
