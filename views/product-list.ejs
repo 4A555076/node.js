@@ -28,6 +28,7 @@
             <tr>
               <th scope="col">商品編號</th>
               <th scope="col">分類</th>
+              <th scope="col">商品圖片</th>
               <th scope="col">商品名稱</th>
               <th scope="col">商品類型</th>
               <th scope="col">商品價格</th>
@@ -41,6 +42,7 @@
             <tr>
               <td><%=r.product_id %></td>
               <td><%=r.product_type==1 ? '商品' : r.product_type==2 ? '課程' : r.product_type==3 ? '住宿' : r.product_type==4 ? '餐點' : '活動'  %></td>
+              <td><img src="/<%= r.product_image %>" width="200" class="product_image"></td>
               <td><%=r.product_name %></td>
               <td><%=r.product_class %></td>
               <td><%=r.products_price %></td>
