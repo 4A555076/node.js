@@ -55,7 +55,9 @@ app.use((req, res, next)=>{
   //直接將session 資料放到locals(res.locals.sessiond)，讓template可以吃到session
   res.locals.session = req.session;
   next();   //若要往下傳->必須呼叫next()
-  })
+});
+
+
 
 app.get("/",(req,res) => {
     res.render('main' , {name:'專題'});
@@ -285,7 +287,7 @@ app.use('/member', require('./routes/member'));
 app.use('/activity',require('./routes/activity'));
 app.use('/product',require('./routes/product'));
 
-app.use(express.static('public'));
+app.use(express.static('public/uploads'));
 //*****所有路由設定都要放在這行之前*****
 app.use((req,res)=>{
   res.type('text/html');
