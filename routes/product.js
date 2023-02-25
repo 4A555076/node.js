@@ -72,7 +72,7 @@ router.get("/add",async(req,res)=>{
     res.render("product-add");
 });
 
-router.post("/add",upload.none(),async(req,res)=>{
+router.post("/add",upload.single("product_image"),async(req,res)=>{
 
     const output = {
         success:false,
@@ -80,6 +80,7 @@ router.post("/add",upload.none(),async(req,res)=>{
         code:0,
         errors:{},
     };
+    let {filename: product_image}=req.file;
 
     let {product_type,product_name, product_class,products_price,products_descripttion,products_unit} = req.body;
 
@@ -88,9 +89,9 @@ router.post("/add",upload.none(),async(req,res)=>{
         return res.json(output);
     }
 
-    const sql = "INSERT INTO `products`(`product_type`,`product_name`, `product_class`,`products_price`,`products_descripttion`,`products_unit`) VALUES (?, ?, ?, ?, ?, ?)";
+    const sql = "INSERT INTO `products`(`product_type`,`product_name`, `product_class`,`products_price`,`products_descripttion`,`products_unit`,`product_image`) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    const [result] = await db.query(sql,[product_type,product_name, product_class,products_price,products_descripttion,products_unit])
+    const [result] = await db.query(sql,[product_type,product_name, product_class,products_price,products_descripttion,products_unit,product_image]);
 
     output.result = result;
     output.success = !! result.affectedRows;
@@ -119,7 +120,7 @@ router.get("/edit/:product_id",async(req,res)=>{
     res.render("product-edit",{...row,referer});
 });
 
-router.put("/edit/:product_id",upload.none(),async(req,res)=>{
+router.put("/edit/:product_id",upload.single("product_image"),async(req,res)=>{
     // return res.json(req.body);
 
     const output = {
@@ -136,15 +137,18 @@ router.put("/edit/:product_id",upload.none(),async(req,res)=>{
     }
 
     const {product_type,product_name,product_class,products_price,products_descripttion,products_unit} = req.body;
+    const {filename: product_image}=req.file;
 
     if(!product_name || product_name.length<1){
         output.errors.product_name = '請輸入正確的商品名稱';
         return res.json(output);
     }
 
-    const sql = "UPDATE `products` SET `product_type`=?,`product_name`=?,`product_class`=?,`products_price`=?,`products_descripttion`=?,`products_unit`=? WHERE `product_id`=?";
 
-    const [result] = await db.query(sql,[product_type,product_name,product_class,products_price,products_descripttion,products_unit,product_id])
+
+    const sql = "UPDATE `products` SET `product_type`=?,`product_name`=?,`product_class`=?,`products_price`=?,`products_descripttion`=?,`products_unit`=?,`product_image`=? WHERE `product_id`=?";
+
+    const [result] = await db.query(sql,[product_type,product_name,product_class,products_price,products_descripttion,products_unit,product_image,product_id])
 
     output.result = result;
     output.success = !! result.changedRows;
