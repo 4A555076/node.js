@@ -1,9 +1,15 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 if (process.argv[2] === 'production') {
   require('dotenv').config({ path: __dirname + '/production.env' });
 } else {
   require('dotenv').config({ path: __dirname + '/dev.env' });
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 };
 
 const bcrypt = require('bcryptjs')
@@ -25,11 +31,17 @@ app.set('view engine', 'ejs');
 //路由設定,routes
 
 const corsOptions = {
+<<<<<<< HEAD
 
   credentials: true,
   origin: (origin, callback) => {
     console.log({ origin });
 
+=======
+  credentials: true,
+  origin: (origin, callback) => {
+    console.log({ origin });
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
     callback(null, true);
   },
 };
@@ -46,22 +58,33 @@ app.use(session({
   //   maxAge: 1200_000    //存活20分鐘
   // }   //瀏覽器持續開著，session基本上一直存活
 }));
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 app.use(express.urlencoded({ extended: false }));
 
 app.use(express.json());
 
 app.use((req, res, next) => {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
   res.locals.title = process.env.SITE_TITLE || "*** 沒有設定 ***";
   //res.locals =>進到template
   //掛在locals底下的屬性會變成template裡的全域變數
 
   //樣板輔助函式 helper function
+<<<<<<< HEAD
 
   res.locals.toDateString = d => moment(d).format('YYYY-MM-DD');
   res.locals.toDatetimeString = d => moment(d).format('YYYY-MM-DD HH:mm:ss');
 
+=======
+  res.locals.toDateString = d => moment(d).format('YYYY-MM-DD');
+  res.locals.toDatetimeString = d => moment(d).format('YYYY-MM-DD HH:mm:ss');
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
   //直接將session 資料放到locals(res.locals.sessiond)，讓template可以吃到session
   res.locals.session = req.session;
   next();   //若要往下傳->必須呼叫next()
@@ -71,55 +94,85 @@ app.use((req, res, next) => {
 
 app.get("/", (req, res) => {
   res.render('main', { name: '專題' });
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 });
 
 // app.use(express.static('node_modules/bootstrap/dist'));
 
 
 //member.json
+<<<<<<< HEAD
 
 app.get('/memberlist', (req, res) => {
 
+=======
+app.get('/memberlist', (req, res) => {
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
   const data = require(__dirname + '/data/member.json');
   //require 可以在程式的任何地方使用
   console.log(data); //取得已經是原生類型
   // res.json(data);  
+<<<<<<< HEAD
 
   res.render('memberlist', { data });
 
+=======
+  res.render('memberlist', { data });
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 });
 
 //取得queryString資料
 //可重複給值 (變成陣列)
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 app.get('/try-qs', (req, res) => {
   res.json(req.query);
 });
 
 app.post(['/try-post', '/try-post2'], (req, res) => {
   res.json(req.body);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 });
 //若沒使用urlencodedParser幫忙處理，req.body為undefined
 //根據檔頭來判斷 資料進來時是否要運作
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 app.get('/try-post-form', (req, res) => {
   res.render('try-post-form');
 });
 
 app.post('/try-post-form', (req, res) => {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
   // res.json(req.body);
   res.render('try-post-form', req.body);
 });
 
+<<<<<<< HEAD
 
 app.post('/try-upload', upload.single('avatar'), (req, res) => {
   res.json(req.file); //上傳單一檔案
 });
 
+=======
+app.post('/try-upload', upload.single('avatar'), (req, res) => {
+  res.json(req.file); //上傳單一檔案
+});
+
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 app.post('/try-uploads', upload.array('photos'), (req, res) => {
   res.json(req.files); //上傳多個檔案
 });
@@ -166,19 +219,29 @@ app.get('/try-moment', (req, res) => {
   const m1c = m1.tz('Asia/Tokyo').format('YYYY-MM-DD HH:mm:ss');
   const m2 = moment('2023-01-05');  //new Date()
   res.json({ m1a, m1b, d1, m1c, m2 });
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 });
 
 
 //註冊
+<<<<<<< HEAD
 
 app.get('/register', (req, res) => {
 
+=======
+app.get('/register', (req, res) => {
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
   res.render('register');
 });
 
 // /auth/register
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 app.post("/auth/register", upload.none(), async (req, res) => {
   const output = {
     success: false,
@@ -199,14 +262,21 @@ app.post("/auth/register", upload.none(), async (req, res) => {
   const sql = "SELECT email FROM member WHERE email=?";
   const [rows] = await db.query(sql, [email]);
   if (rows.length > 0) {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
     output.error = '信箱已註冊過!'
     return res.json(output)
   }
 
+<<<<<<< HEAD
 
   if (password !== password2) {
 
+=======
+  if (password !== password2) {
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
     output.error = '密碼不一致!'
     return res.json(output)
   }
@@ -219,14 +289,21 @@ app.post("/auth/register", upload.none(), async (req, res) => {
   const newSQL = "INSERT INTO `member`(`name`, `email`,`mobile`, `birthday`, `address`,`password`,`created_at`)VALUES(?, ?, ?, ?, ?, ?,NOW())";
 
   const [result] = await db.query(newSQL, [name, email, mobile, birthday, address, hashedPassword]);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 
   output.result = result;
   output.success = !!result.affectedRows;
 
+<<<<<<< HEAD
 
   return res.json(output);
 
+=======
+  return res.json(output);
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 
   // if(error) {
   //   console.log(error)
@@ -235,14 +312,20 @@ app.post("/auth/register", upload.none(), async (req, res) => {
   //   message: 'User registered!'
   //   })
   //   }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 })
 
 
 
 
 //新增會員資料
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 app.get('/add-member', async (req, res) => {
   return res.json({}); //已新增就不要再新增了
   const sql = "INSERT INTO `member`(`name`, `email`, `password`, `hash`, `created_at`) VALUES ('tester', ?, ?, '', Now())";
@@ -267,7 +350,10 @@ app.post('/login', upload.none(), async (req, res) => {
   };
   const { email, password } = req.body;
   if (!email | !password) {  //若email或密碼 其中一個沒有
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
     output.error = '欄位資料不足'
     output.code = 400;
     return res.json(output);
@@ -278,17 +364,26 @@ app.post('/login', upload.none(), async (req, res) => {
   //   return res.json(output);
   // }
   // output.id =id;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
   output.email = email;
   const sql = "SELECT * FROM  member WHERE email =?";
   const [rows] = await db.query(sql, [email]); //上方的? => [email]
   if (rows.length < 1) {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
     output.error = '信箱錯誤'
     output.code = 410;
     return res.json(output);
   }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
   const row = rows[0];
 
   //密碼比對
@@ -314,24 +409,36 @@ app.post('/login', upload.none(), async (req, res) => {
 app.get('/logout', async (req, res) => {
   delete req.session.user; //刪掉session
   return res.redirect('/');  //轉向首頁
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 });
 
 //不透過表單登入流程(不使用帳密)
 //快速登入
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 app.get('/fake1', async (req, res) => {
   req.session.user = {
     id: 1,
     email: 'test123@test.com',
     name: '管理者'  //密碼: 24680
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
   };
   return res.redirect('/');  //轉向首頁
 });
 
 //忘記密碼
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 app.post('/forget-password', async (req, res) => {
   const { email } = req.body;
 
@@ -343,7 +450,10 @@ app.post('/forget-password', async (req, res) => {
     auth: {
       user: 'testerforispanproject@gmail.com',
       pass: 'hjpucggdagcfnvws'
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
     },
     tls: {
       rejectUnauthorized: false
@@ -351,7 +461,10 @@ app.post('/forget-password', async (req, res) => {
   });
 
   await transporter.sendMail({
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
     from: 'testerforispanproject@gmail.com',
     to: email,
     subject: '重設密碼',
@@ -367,12 +480,18 @@ app.post('/reset-password', async (req, res) => {
     postData: req.query, //除錯用
     postData2: req.body, //除錯用
     code: 0,
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
     errors: {}
   };
 
   // return res.json(output)
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
   const { token, email } = req.query;
   const { password, password2 } = req.body;
   if (!token || !password || !password2) {
@@ -384,7 +503,10 @@ app.post('/reset-password', async (req, res) => {
   //   return res.status(400).json({message:'Invalid Token'})
   // }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
   let hashedPassword = await bcrypt.hash(password, 10)
   const sql = "UPDATE `member` SET `password`=? WHERE `email`=?";
   const [result] = await db.query(sql, [hashedPassword, email]);
@@ -407,6 +529,7 @@ app.post('/reset-password', async (req, res) => {
   // await user.save();
 
 
+<<<<<<< HEAD
 
   res.json({ ...output, message: '密碼重設成功' })
 
@@ -416,6 +539,29 @@ app.get('/uploads/:fileName', (req, res) => {
   const filePath = __dirname + '/public/uploads/' + fileName;
   res.sendFile(filePath);
 });
+=======
+  res.json({ ...output, message: '密碼重設成功' })
+
+})
+
+// 前端發送取得圖片的api
+app.get('/uploads/:fileName', (req, res) => {
+  const fileName = req.params.fileName;
+  const filePath = __dirname + '/public/uploads/' + fileName;
+
+  res.sendFile(filePath);
+});
+
+
+//baseUrl
+app.use('/member', require('./routes/member'));
+app.use('/activity', require('./routes/activity'));
+app.use('/product', require('./routes/product'));
+// 前端讀取圖片時使用的URL
+app.use('/uploads/:fileName?', express.static(__dirname + '/public/uploads'));
+
+app.use(express.static('public/uploads'));
+>>>>>>> 91811b1ca59a3d8b72371375fd5ecc26b9ef678e
 //*****所有路由設定都要放在這行之前*****
 app.use((req, res) => {
   res.type('text/html');
