@@ -379,6 +379,7 @@ app.get('/uploads/:fileName', (req, res) => {
 
 //baseUrl
 app.use('/member', require('./routes/member'));
+app.use('/orderList',require('./routes/orderList'));
 app.use('/activity', require('./routes/activity'));
 app.use('/product', require('./routes/product'));
 // 前端讀取圖片時使用的URL
