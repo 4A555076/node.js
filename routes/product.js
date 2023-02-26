@@ -12,10 +12,10 @@ router.use((req,res,next)=>{
 
     res.locals = {...res.locals,url,baseUrl,originalUrl};
     //不能使用-> res.locals.url = url (會將先前在index設定的middleware排除)
-    if(! req.session.user){  //如果沒有登入會員,就看不到新增會員表單
-        req.session.lastPage = req.originalUrl;  
-        return res.redirect('/login');
-    }
+    // if(! req.session.user){  //如果沒有登入會員,就看不到新增會員表單
+    //     req.session.lastPage = req.originalUrl;  
+    //     return res.redirect('/login');
+    // }
 
     next();
 });
@@ -59,9 +59,8 @@ const getListData = async(req,res)=>{
         if(page>totalPages){
             return res.redirect("?page="+totalPages);  //頁面轉向到最後一頁
         }
-        // const sql = `SELECT * FROM products ${where} ${orderbySQL} LIMIT ${(page-1)*perPage},${perPage}`;
-        const sql = `SELECT product_type.* , products.* FROM  products JOIN product_type ON product.type_id=product_type.type_id ${where} ${orderbySQL} LIMIT ${(page-1)*perPage},${perPage}`;
-        // SELECT activitypettype.* , activity.* FROM `activity` JOIN `activitypettype` ON activity.activity_pettype=activitypettype.activity_pettype WHERE activity_id=1;
+
+        const sql = `SELECT product_type.* , products.* FROM  products JOIN product_type ON products.product_type=product_type.type_id ${where} ${orderbySQL} LIMIT ${(page-1)*perPage},${perPage}`;
         [rows] = await db.query(sql);
     }
 
@@ -73,7 +72,7 @@ router.get("/add",async(req,res)=>{
     res.render("product-add");
 });
 
-router.post("/add",upload.none(),async(req,res)=>{
+router.post("/add",upload.single("product_image"),async(req,res)=>{
 
     const output = {
         success:false,
@@ -81,6 +80,7 @@ router.post("/add",upload.none(),async(req,res)=>{
         code:0,
         errors:{},
     };
+    let {filename: product_image}=req.file;
 
     let {product_type,product_name, product_class,products_price,products_descripttion,products_unit} = req.body;
 
@@ -89,9 +89,9 @@ router.post("/add",upload.none(),async(req,res)=>{
         return res.json(output);
     }
 
-    const sql = "INSERT INTO `products`(`product_type`,`product_name`, `product_class`,`products_price`,`products_descripttion`,`products_unit`) VALUES (?, ?, ?, ?, ?, ?)";
+    const sql = "INSERT INTO `products`(`product_type`,`product_name`, `product_class`,`products_price`,`products_descripttion`,`products_unit`,`product_image`) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    const [result] = await db.query(sql,[product_type,product_name, product_class,products_price,products_descripttion,products_unit])
+    const [result] = await db.query(sql,[product_type,product_name, product_class,products_price,products_descripttion,products_unit,product_image]);
 
     output.result = result;
     output.success = !! result.affectedRows;
@@ -120,7 +120,7 @@ router.get("/edit/:product_id",async(req,res)=>{
     res.render("product-edit",{...row,referer});
 });
 
-router.put("/edit/:product_id",upload.none(),async(req,res)=>{
+router.put("/edit/:product_id",upload.single("product_image"),async(req,res)=>{
     // return res.json(req.body);
 
     const output = {
@@ -137,15 +137,18 @@ router.put("/edit/:product_id",upload.none(),async(req,res)=>{
     }
 
     const {product_type,product_name,product_class,products_price,products_descripttion,products_unit} = req.body;
+    const {filename: product_image}=req.file;
 
     if(!product_name || product_name.length<1){
         output.errors.product_name = '請輸入正確的商品名稱';
         return res.json(output);
     }
 
-    const sql = "UPDATE `products` SET `product_type`=?,`product_name`=?,`product_class`=?,`products_price`=?,`products_descripttion`=?,`products_unit`=? WHERE `product_id`=?";
 
-    const [result] = await db.query(sql,[product_type,product_name,product_class,products_price,products_descripttion,products_unit,product_id])
+
+    const sql = "UPDATE `products` SET `product_type`=?,`product_name`=?,`product_class`=?,`products_price`=?,`products_descripttion`=?,`products_unit`=?,`product_image`=? WHERE `product_id`=?";
+
+    const [result] = await db.query(sql,[product_type,product_name,product_class,products_price,products_descripttion,products_unit,product_image,product_id])
 
     output.result = result;
     output.success = !! result.changedRows;
@@ -162,6 +165,32 @@ router.get("/api",async(req,res)=>{
     const output = await getListData(req,res);
     res.json(output);
 });
+
+router.get("/list-product/:product_type",async(req,res)=>{
+
+    const product_type = +req.params.product_type || 0;
+    if(!product_type){
+        return res.redirect(req.baseUrl); //轉向到列表頁
+    }
+
+    const sql = "SELECT * FROM products WHERE product_type=?";
+    const [rows] = await db.query(sql,[product_type]);
+    res.json(rows);
+
+})
+
+router.get("/list-detail/:product_id",async(req,res)=>{
+
+    const product_id = +req.params.product_id || 0;
+    if(!product_id){
+        return res.redirect(req.baseUrl); //轉向到列表頁
+    }
+
+    const sql = "SELECT * FROM products WHERE product_id=?";
+    const [rows] = await db.query(sql,[product_id]);
+    res.json(rows);
+
+})
 
 router.delete("/:product_id",async(req,res)=>{
     const output = {

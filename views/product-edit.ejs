@@ -15,7 +15,7 @@
                 <option value="2" <%= "product_type" == 2 ? 'selected' : '' %>>課程</option>
                 <option value="3" <%= "product_type" == 3 ? 'selected' : '' %>>住宿</option>
                 <option value="4" <%= "product_type" == 4 ? 'selected' : '' %>>餐點</option>
-                <option value="4" <%= "product_type" == 5 ? 'selected' : '' %>>活動</option>
+                <option value="5" <%= "product_type" == 5 ? 'selected' : '' %>>活動</option>
               </select>
             </div>
             <div class="mb-3">
@@ -43,6 +43,11 @@
               <label for="products_unit" class="form-label">販售單位</label>
               <input type="text" class="form-control" id="products_unit" name="products_unit" value="<%= products_unit %>">
               <div class="form-text"></div>
+            </div>
+            <div class="mb-3">
+              <label for="product_image" class="product_image">選擇圖片</label>
+              <input type="file" class="form-control" id="product_image" name="product_image">
+              <img src="/<%= product_image %>" width="200" class="product_image mt-3">
             </div>
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
               <input type="button" class="btn btn-primary me-md-2" onclick="history.back();" value="返回">
