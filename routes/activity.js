@@ -86,7 +86,7 @@ router.get("/add",async(req,res)=>{
     res.render("activity-add");
 });
 
-router.post("/add",upload.none(),async(req,res)=>{
+router.post("/add",upload.single("activity_image"),async(req,res)=>{
 
     const output = {
         success:false,
@@ -95,6 +95,8 @@ router.post("/add",upload.none(),async(req,res)=>{
         errors:{},
     };
 
+    let {filename: activity_image}=req.file;
+
     let {activity_name,activity_datestart, activity_dateend,activity_pettype,activity_location,activity_decription, activity_notice} = req.body;
 
     if(!activity_name || activity_name.length<1){
@@ -102,9 +104,9 @@ router.post("/add",upload.none(),async(req,res)=>{
         return res.json(output);
     }
 
-    const sql = "INSERT INTO `activity`(`activity_name`,`activity_datestart`, `activity_dateend`,`activity_pettype`,`activity_location`,`activity_decription`, `activity_notice`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    const sql = "INSERT INTO `activity`(`activity_name`,`activity_datestart`, `activity_dateend`,`activity_pettype`,`activity_location`,`activity_decription`, `activity_notice`,`activity_image`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-    const [result] = await db.query(sql,[activity_name,activity_datestart, activity_dateend,activity_pettype,activity_location,activity_decription, activity_notice])
+    const [result] = await db.query(sql,[activity_name,activity_datestart, activity_dateend,activity_pettype,activity_location,activity_decription, activity_notice,activity_image])
 
     output.result = result;
     output.success = !! result.affectedRows;
@@ -133,7 +135,7 @@ router.get("/edit/:activity_id",async(req,res)=>{
     res.render("activity-edit",{...row,referer});
 });
 
-router.put("/edit/:activity_id",upload.none(),async(req,res)=>{
+router.put("/edit/:activity_id",upload.single("activity_image"),async(req,res)=>{
     // return res.json(req.body);
 
     const output = {
@@ -151,14 +153,16 @@ router.put("/edit/:activity_id",upload.none(),async(req,res)=>{
 
     const {activity_name,activity_datestart,activity_dateend,activity_pettype,activity_location,activity_decription,activity_notice} = req.body;
 
+    const {filename: activity_image}=req.file;
+
     if(!activity_name || activity_name.length<1){
         output.errors.activity_name = '請輸入正確的活動名稱';
         return res.json(output);
     }
 
-    const sql = "UPDATE `activity` SET `activity_name`=?,`activity_datestart`=?,`activity_dateend`=?,`activity_pettype`=?,`activity_location`=?,`activity_decription`=?,`activity_notice`=? WHERE `activity_id`=?";
+    const sql = "UPDATE `activity` SET `activity_name`=?,`activity_datestart`=?,`activity_dateend`=?,`activity_pettype`=?,`activity_location`=?,`activity_decription`=?,`activity_notice`=?,`activity_image`=? WHERE `activity_id`=?";
 
-    const [result] = await db.query(sql,[activity_name,activity_datestart,activity_dateend,activity_pettype,activity_location,activity_decription,activity_notice,activity_id])
+    const [result] = await db.query(sql,[activity_name,activity_datestart,activity_dateend,activity_pettype,activity_location,activity_decription,activity_notice,activity_image,activity_id])
 
     output.result = result;
     output.success = !! result.changedRows;
