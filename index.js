@@ -382,6 +382,7 @@ app.use('/member', require('./routes/member'));
 app.use('/orderList',require('./routes/orderList'));
 app.use('/activity', require('./routes/activity'));
 app.use('/product', require('./routes/product'));
+app.use('/room',require('./routes/room'));
 // 前端讀取圖片時使用的URL
 app.use('/uploads/:fileName?', express.static(__dirname + '/public/uploads'));
 
