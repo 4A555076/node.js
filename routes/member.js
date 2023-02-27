@@ -87,13 +87,14 @@ router.get('/add', async(req, res)=>{
   res.render('admin-add');
 });
 
-router.post('/add', upload.none(), async(req, res)=>{ 
+router.post('/add', upload.single('avatar'), async(req, res)=>{ 
   const output = {
     success:false,
     postData: req.body, //除錯用
     code:0,
     errors: {}
   };
+  let{filename: avatar}=req.file;
 
   let {name,email,mobile,birthday,address}=req.body; //解構
 
@@ -106,8 +107,8 @@ router.post('/add', upload.none(), async(req, res)=>{
   birthday = birthday.isValid() ? birthday.format('YYYY-MM-DD') : null;   //如果格式錯誤，填空值
 
   //TODO: 資料檢查
-    const sql = "INSERT INTO `member`(`name`, `email`,`mobile`, `birthday`, `address`,`created_at`)VALUES(?, ?, ?, ?, ?,NOW())";
-  const [result] = await db.query(sql, [name, email , mobile, birthday, address]);
+    const sql = "INSERT INTO `member`(`name`, `email`,`mobile`, `birthday`, `address`, `avatar`,`created_at`)VALUES(?, ?, ?, ?, ?, ?, NOW())";
+  const [result] = await db.query(sql, [name, email , mobile, birthday, address, avatar]);
 
   output.result = result; 
   output.success = !!result.affectedRows; //轉成boolean (affectedRows 1 : true ; affectedRows 0 :false )
@@ -116,6 +117,26 @@ router.post('/add', upload.none(), async(req, res)=>{
   res.json(output);   //=>結束，所以不須加return                   
   //upload.none()->不要上傳，但需要middleware幫忙解析資料
 });
+// //圖片上傳
+// router.post('/upload', upload.single('avatar'), async(req, res)=>{
+//   const output = {
+//     success:false,
+//     postData: req.body, //除錯用
+//     code:0,
+//     errors: {}
+//   };
+//   let{filename: avatar}=req.file;
+
+//   //TODO: 資料檢查
+//   const sql = "INSERT INTO `member`(`avatar`)VALUES(?)";
+//   const [result] = await db.query(sql, [avatar]);
+
+//   output.result = result; 
+//   output.success = !!result.affectedRows; //轉成boolean (affectedRows 1 : true ; affectedRows 0 :false )
+  
+//   //affectedRows
+//   res.json(output);   //=>結束，所以不須加return 
+// })
 
 //新增寵物api
 router.get('/addPet/:mid', async(req, res)=>{ 
@@ -176,7 +197,7 @@ router.get('/edit/:mid', async(req, res)=>{
   // res.render('admin-edit', {...row, referer});  //展開->email、name..這些變數 
 });
 //http方法->使用put;  RESTful API 基本規定-> CRUD -> get/ post / 修改:put / delete
-router.put('/edit/:mid', upload.none(), async(req, res)=>{ 
+router.put('/edit/:mid', upload.single('avatar'), async(req, res)=>{ 
   const output = {   //定義要輸出資訊的格式
     success:false,
     postData: req.body, //除錯用
@@ -190,7 +211,11 @@ router.put('/edit/:mid', upload.none(), async(req, res)=>{
   }
 
   let {name,email,mobile,birthday,address,member_status}=req.body; //解構
-  console.log('name', req.body)
+  const {filename: avatar} = req.file;
+  // console.log(req.file);
+
+
+  // console.log('name', req.body)
   if(!name || name.length<2 ){
     output.errors.name='請輸入正確的姓名';
     return res.json(output);   //輸出，但後面不執行時->加return
@@ -200,8 +225,9 @@ router.put('/edit/:mid', upload.none(), async(req, res)=>{
   birthday = birthday.isValid() ? birthday.format('YYYY-MM-DD') : null;   //如果格式錯誤，填空值
 
   //TODO: 資料檢查
-    const sql = "UPDATE `member` SET `name`=?,`email`=?,`mobile`=?,`birthday`=?,`address`=?,`member_status`=? WHERE `mid`=?";
-  const [result] = await db.query(sql, [name, email, mobile, birthday, address, member_status, mid]);
+    const sql = "UPDATE `member` SET `name`=?,`email`=?,`mobile`=?,`birthday`=?,`address`=?,`member_status`=?,`avatar`=? WHERE `mid`=?";
+  const [result] = await db.query(sql, [name, email, mobile, birthday, address, member_status, avatar, mid]);
+ 
 
   output.result = result; 
   output.success = !!result.changedRows; //轉成boolean (changedRows 1 : true ; changedRows 0 :false )
