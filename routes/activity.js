@@ -12,10 +12,10 @@ router.use((req,res,next)=>{
 
     res.locals = {...res.locals,url,baseUrl,originalUrl};
     //不能使用-> res.locals.url = url (會將先前在index設定的middleware排除)
-    if(! req.session.user){  //如果沒有登入會員,就看不到新增會員表單
-        req.session.lastPage = req.originalUrl;  
-        return res.redirect('/login');
-    }
+    // if(! req.session.user){  //如果沒有登入會員,就看不到新增會員表單
+    //     req.session.lastPage = req.originalUrl;  
+    //     return res.redirect('/login');
+    // }
 
     next();
 });
