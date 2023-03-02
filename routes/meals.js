@@ -158,7 +158,7 @@ router.put("/edit/:product_id",upload.single("product_image"),async(req,res)=>{
 
 router.get("/",async(req,res)=>{
     const output = await getListData(req,res);
-    res.render('product-list',output);
+    res.render('meals-list',output);
 });
 
 router.get("/api",async(req,res)=>{

@@ -11,30 +11,28 @@
             <div class="mb-3">
               <label for="product_type" class="form-label">分類</label>
               <select name="product_type" id="product_type" class="form-select">
-                <option value="1" <%= "product_type" == 1 ? 'selected' : '' %>>商品</option>
-                <option value="2" <%= "product_type" == 2 ? 'selected' : '' %>>課程</option>
-                <option value="3" <%= "product_type" == 3 ? 'selected' : '' %>>住宿</option>
+               
                 <option value="4" <%= "product_type" == 4 ? 'selected' : '' %>>餐點</option>
-                <option value="5" <%= "product_type" == 5 ? 'selected' : '' %>>活動</option>
+              
               </select>
             </div>
             <div class="mb-3">
-              <label for="product_name" class="form-label">商品名稱</label>
+              <label for="product_name" class="form-label">餐點名稱</label>
               <input type="text" class="form-control" id="product_name" name="product_name">
               <div class="form-text"></div>
             </div>
             <div class="mb-3">
-              <label for="product_class" class="form-label">商品類型</label>
+              <label for="product_class" class="form-label">餐點類型</label>
               <input type="text" class="form-control" id="product_class" name="product_class">
               <div class="form-text"></div>
             </div>
             <div class="mb-3">
-              <label for="products_price" class="form-label">商品價格</label>
+              <label for="products_price" class="form-label">餐點價格</label>
               <input type="number" class="form-control" id="products_price" name="products_price">
               <div class="form-text"></div>
             </div>
             <div class="mb-3">
-              <label for="products_descripttion" class="form-label">商品說明 </label>
+              <label for="products_descripttion" class="form-label">餐點說明 </label>
               <textarea  class="form-control" id="products_descripttion" name="products_descripttion" cols="30" rows="6"></textarea>
               <div class="form-text"></div>
             </div>
