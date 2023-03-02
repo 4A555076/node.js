@@ -1,16 +1,16 @@
 const express = require('express');
 const db = require('../modules/connect-mysql');
 const upload = require('../modules/upload-img');
-const moment = require('moment-timezone');
-
+// const moment = require('moment-timezone');
 const router = express.Router();
 
-//針對此模組的頂層 ; 經過路由前，會先經過此middleware
-//url, baseUrl, originalUrl 要在這裡拿，若在index那裡拿，originalUrl會一樣，但url & baseUrl會不同 
 router.use((req,res,next)=>{
     const {url,baseUrl,originalUrl} = req;
 
     res.locals = {...res.locals,url,baseUrl,originalUrl};
+
+//針對此模組的頂層 ; 經過路由前，會先經過此middleware
+//url, baseUrl, originalUrl 要在這裡拿，若在index那裡拿，originalUrl會一樣，但url & baseUrl會不同 
     //不能使用-> res.locals.url = url (會將先前在index設定的middleware排除)
     // if(! req.session.user){  //如果沒有登入會員,就看不到新增會員表單
     //     req.session.lastPage = req.originalUrl;  
@@ -29,7 +29,7 @@ const getListData = async(req,res)=>{
     }
 
     //關鍵字搜尋
-    let where = ' WHERE 4 ';
+    let where = ' WHERE product_type = 4 ';
     let search = req.query.search || '';
     let orderby = req.query.orderby || '';
 
