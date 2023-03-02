@@ -117,7 +117,7 @@ router.get("/edit/:product_id",async(req,res)=>{
     //從哪裡來
     const referer = req.get('Referer') || req.baseUrl;
     
-    res.render("product-edit",{...row,referer});
+    res.render("meals-edit",{...row,referer});
 });
 
 router.put("/edit/:product_id",upload.single("product_image"),async(req,res)=>{
