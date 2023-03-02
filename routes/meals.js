@@ -29,7 +29,7 @@ const getListData = async(req,res)=>{
     }
 
     //關鍵字搜尋
-    let where = ' WHERE 1 ';
+    let where = ' WHERE 4 ';
     let search = req.query.search || '';
     let orderby = req.query.orderby || '';
 
@@ -69,7 +69,7 @@ const getListData = async(req,res)=>{
 
 
 router.get("/add",async(req,res)=>{
-    res.render("product-add");
+    res.render("meals-add");
 });
 
 router.post("/add",upload.single("product_image"),async(req,res)=>{
