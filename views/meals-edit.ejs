@@ -6,7 +6,7 @@
     <div class="col-6">
       <div class="card" >
         <div class="card-body">
-          <h5 class="card-title">修改商品資料</h5>
+          <h5 class="card-title">修改餐點資料</h5>
           <form name="form1" onsubmit="sendForm(event)">
             <div class="mb-3">
               <label for="product_type" class="form-label">分類</label>
@@ -19,22 +19,22 @@
               </select>
             </div>
             <div class="mb-3">
-              <label for="product_name" class="form-label">商品名稱 </label>
+              <label for="product_name" class="form-label">餐點名稱 </label>
               <input type="text" class="form-control" id="product_name" name="product_name" value="<%= product_name %>">
               <div class="form-text"></div>
             </div>
             <div class="mb-3">
-              <label for="product_class" class="form-label">商品類型</label>
+              <label for="product_class" class="form-label">餐點類型</label>
               <input type="text" class="form-control" id="product_class" name="product_class" value="<%= product_class %>">
               <div class="form-text"></div>
             </div>
             <div class="mb-3">
-              <label for="products_price" class="form-label">商品價格</label>
+              <label for="products_price" class="form-label">餐點價格</label>
               <input type="number" class="form-control" id="products_price" name="products_price" value="<%= products_price %>">
               <div class="form-text"></div>
             </div>
             <div class="mb-3">
-              <label for="products_descripttion" class="form-label">商品說明 </label>
+              <label for="products_descripttion" class="form-label">餐點說明 </label>
               <textarea  class="form-control" id="products_descripttion" name="products_descripttion" cols="30" rows="6"><%= products_descripttion%></textarea>
               <!-- <textarea  class="form-control" id="products_descripttion2" name="products_descripttion" cols="30" rows="6"><%= products_descripttion%></textarea> -->
               <div class="form-text"></div>
