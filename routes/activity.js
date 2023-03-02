@@ -184,6 +184,27 @@ router.get("/api",async(req,res)=>{
     res.json(output);
 });
 
+router.get("/activitydetail/:activity_id",async(req,res)=>{
+    const output = {
+        success:false,
+        postData:req.body,
+        code:0,
+        errors:{},
+    };
+    const activity_id = +req.params.activity_id ||0;
+    if(!activity_id){
+        output.error.activity_id = '沒有資料編號';
+        return res.json(output);  //API不要用轉向
+    }
+    const sql = "SELECT * FROM activity WHERE activity_id=?";
+    const [rows] = await db.query(sql,[activity_id]);
+    if(rows.length<1){
+        return res.redirect(req.baseUrl); //轉向到列表頁
+    }
+    // const row = rows[0];
+    res.json(rows[0]);
+});
+
 router.delete("/:activity_id",async(req,res)=>{
     const output = {
         success:false,
