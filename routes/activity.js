@@ -61,7 +61,7 @@ const getListData = async(req,res)=>{
   }
 
 
-    const perPage = 10;
+    const perPage = 20;
     const t_sql = `SELECT COUNT(1) totalRows FROM activity ${where}`;
     const [[{totalRows}]] = await db.query(t_sql);
 
