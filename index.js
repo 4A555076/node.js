@@ -208,8 +208,13 @@ app.post("/auth/register", upload.none(), async (req, res) => {
   //   })
   //   }
 })
-
-
+// 前端取得某個會員資料的api
+app.get('/:mid?', async (req, res) => {
+  const mid = +req.params.mid || 0;
+  const sql = 'SELECT * FROM member WHERE mid=?';
+  const [result] = await db.query(sql, [mid])
+  res.json(result)
+})
 
 
 //新增會員資料
@@ -379,10 +384,10 @@ app.get('/uploads/:fileName', (req, res) => {
 
 //baseUrl
 app.use('/member', require('./routes/member'));
-app.use('/orderList',require('./routes/orderList'));
+app.use('/orderList', require('./routes/orderList'));
 app.use('/activity', require('./routes/activity'));
 app.use('/product', require('./routes/product'));
-app.use('/room',require('./routes/room'));
+app.use('/room', require('./routes/room'));
 // 前端讀取圖片時使用的URL
 app.use('/uploads/:fileName?', express.static(__dirname + '/public/uploads'));
 
