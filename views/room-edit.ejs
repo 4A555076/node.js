@@ -43,14 +43,25 @@
               <div class="form-text"></div>
             </div>
             <div class="mb-3">
+              <textarea type="text" name="product_image" readonly cols="80"><%= product_image %></textarea>
+              <br>
               <label for="product_image" class="product_image">選擇圖片</label>
-              <input type="file" class="form-control" id="product_image" name="product_image">
-              <img src="/<%= product_image %>" width="200" class="product_image mt-3">
+              <button type="button" onclick="selectFileBtn.click()">選擇圖片</button>
+
+              <% const myImages = product_image.split(',') %>
+              <% for(let img of myImages){ %>
+                <img src="/<%= img %>" width="200">
+              <% } %>
+              
             </div>
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
               <input type="button" class="btn btn-primary me-md-2" onclick="history.back();" value="返回">
               <button type="submit" class="btn btn-primary">送出</button>
             </div>
+          </form>
+
+          <form name="uploadForm" style="display:none">
+            <input type="file" class="form-control" id="selectFileBtn" name="images" multiple="multiple">
           </form>
         </div>
       </div>
@@ -65,6 +76,31 @@
   // const productsDescripttion1 = document.getElementById('products_descripttion1').value
   // const productsDescripttion2 = document.getElementById('products_descripttion2').value
   // const productsDescripttion = `<p>${productsDescripttion1}</p><p>${productsDescripttion2}</p>`
+
+  const uploadForm = document.uploadForm;
+  const selectFileBtn = document.querySelector('#selectFileBtn');
+
+  selectFileBtn.onchange = (e)=>{
+    const fd = new FormData(uploadForm);
+
+    fetch('/room/upload-img',{
+      method: 'POST',
+      body: fd
+    }).then(r=>r.json())
+    .then(ar=>{
+      let ori = document.form1.product_image.value;
+      ori = ori.split(',');
+
+      ar.forEach(f=>{
+        ori.push(f.filename);
+      })
+
+      document.form1.product_image.value = ori.join(',');
+
+    })
+
+  }
+
 
   function sendForm(event){
     event.preventDefault();

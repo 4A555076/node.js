@@ -93,6 +93,10 @@ router.post("/add",upload.single("product_image"),async(req,res)=>{
   res.json(output);
 });
 
+router.post("/upload-img",upload.array("images"),async(req,res)=>{
+  res.json(req.files);
+});
+
 
 router.get("/edit/:product_id",async(req,res)=>{
 
@@ -115,7 +119,7 @@ router.get("/edit/:product_id",async(req,res)=>{
   res.render("room-edit",{...row,referer});
 });
 
-router.put("/edit/:product_id",upload.single("product_image"),async(req,res)=>{
+router.put("/edit/:product_id",upload.none(),async(req,res)=>{
   // return res.json(req.body);
 
   const output = {
@@ -131,8 +135,8 @@ router.put("/edit/:product_id",upload.single("product_image"),async(req,res)=>{
       return res.json(output);  //API不要用轉向
   }
 
-  const {product_type,product_name,product_class,products_price,products_descripttion,products_unit} = req.body;
-  const {filename: product_image}=req.file;
+  const {product_type,product_name,product_class,products_price,products_descripttion,products_unit, product_image} = req.body;
+  // const {filename: product_image}=req.file;
 
   if(!product_name || product_name.length<1){
       output.errors.product_name = '請輸入正確的商品名稱';
