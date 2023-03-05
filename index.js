@@ -209,7 +209,7 @@ app.post("/auth/register", upload.none(), async (req, res) => {
   //   }
 })
 // 前端取得某個會員資料的api
-app.get('/:mid?', async (req, res) => {
+app.get('/member/:mid?', async (req, res) => {
   const mid = +req.params.mid || 0;
   const sql = 'SELECT * FROM member WHERE mid=?';
   const [result] = await db.query(sql, [mid])
@@ -381,6 +381,38 @@ app.get('/uploads/:fileName', (req, res) => {
   res.sendFile(filePath);
 });
 
+// TODO:完成判斷訂單type_id是否需要再新增一支API(或者邏輯讓前端處理)
+app.post('/:mid/orders/:type_id', async (req, res) => {
+  try {
+    const mid = +req.params.mid || 0;
+    const status = 0;
+    let { member_id, recipient_name, recipient_address, recipient_phone, products_id, type_id, products_quantity, products_price } = req.body
+    const order_date = moment.tz('Asia/Taipei').format('YYYY-MM-DD HH:mm:ss');
+    const sql = `INSERT INTO od(member_id, status, order_date, recipient_name, recipient_address, recipient_phone) VALUES( ?, ?, ?, ?, ?, ?)`
+    const [addOrderResult] = await db.query(sql, [member_id, status, order_date, recipient_name, recipient_address, recipient_phone])
+    // 取得剛才新增的訂單ID
+    const orderID = addOrderResult.insertId;
+    if (orderID) {
+      // 如果新增訂單成功並取得對應ID，繼續新增detail的內容
+      const detailSql = `INSERT INTO od_detail(order_id, products_id, type_id, products_quantity, products_price) VALUES (?,?,?,?,?)`
+      const [addDetailResult] = await db.query(detailSql, [orderID, products_id, type_id, products_quantity, products_price])
+      if (addDetailResult) {
+        // 回傳新增訂單明細成功
+        res.json({ success: true })
+        if (type_id === 3) {
+
+        }
+      } else {
+        // 回傳新增訂單明細失敗
+        res.json({ success: false, message: 'Failed to add order detail' })
+      }
+    } else {
+      res.json({ success: false, message: 'Failed to add order' })
+    }
+  } catch {
+
+  }
+})
 
 //baseUrl
 app.use('/member', require('./routes/member'));
