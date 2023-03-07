@@ -322,7 +322,7 @@ router.get('/pet-list/:mid', async(req, res)=>{
 });
 
 //加入收藏
-router.get('/toggle-like/:product_id', async (req, res)=>{
+router.post('/toggle-like/:product_id', async (req, res)=>{
   const output = {
   success: false,
   error: '',
@@ -333,11 +333,11 @@ router.get('/toggle-like/:product_id', async (req, res)=>{
   // output.error = '必須登入會員, 才能加到最愛';
   // return res.json(output);
   // }
-  const mid = +req.params.mid || 0 ;
-  const product_id = +req.params.product_id ||0;
+  const product_id = +req.params.product_id || 0;
+  const {id: mid, typeID: type_id} = req.body
 
-  const sql1 = "SELECT * FROM product_likes WHERE `mid`=? AND `product_id`=?";
-  const [likes] = await db.query(sql1, [mid, product_id]);
+  const sql1 = "SELECT * FROM product_likes WHERE `mid`=? AND `product_id`=? AND `type_id`=?";
+  const [likes] = await db.query(sql1, [mid, product_id, type_id]);
 
   if(likes.length){
   const sql2 = "DELETE FROM `product_likes` WHERE sid=" + likes[0].sid;
@@ -346,9 +346,9 @@ router.get('/toggle-like/:product_id', async (req, res)=>{
   output.action = 'delete';
   } else {
 // TODO: 判斷有沒有這個商品
-  const sql3 = "INSERT INTO `product_likes`(`mid`, `product_id`) VALUES (?,?)";
+  const sql3 = "INSERT INTO `product_likes`(`mid`, `product_id`,`type_id`) VALUES (?,?,?)";
   const [result] = await db.query(sql3, [
-     mid,product_id
+     mid,product_id,type_id
   ]);
   output.success = !! result.affectedRows;
   output.action = 'insert';
