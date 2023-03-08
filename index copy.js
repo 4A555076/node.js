@@ -390,7 +390,7 @@ app.use(express.static('public/uploads'));
 
 //搜尋資料庫的課程商品並顯示到前端的API
 app.get("/courses", async(req, res) => {
-  const [rows]=await  db.query("SELECT * FROM products WHERE product_type=2");
+  const [rows]=await  db.query("SELECT * FROM product WHERE product_type=2");
    
    res.json(rows);
     });
@@ -398,14 +398,14 @@ app.get("/courses", async(req, res) => {
 //按照課程主題分類分別顯示相關課程的API
 app.get("/courses:class", async(req, res) => {
       const param=req.params.class;
-      const [rows]=await  db.query(`SELECT * FROM products WHERE product_class=${param}`);
+      const [rows]=await  db.query(`SELECT * FROM product WHERE product_class=${param}`);
        
        res.json(rows);
         });
 //找單堂課的API
 app.get("/courses:name", async(req, res) => {
           const param=req.params.name;
-          const [rows]=await  db.query(`SELECT * FROM products WHERE product_name=${param}`);
+          const [rows]=await  db.query(`SELECT * FROM product WHERE product_name=${param}`);
            
            res.json(rows);
             });
