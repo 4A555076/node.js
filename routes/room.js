@@ -77,16 +77,16 @@ router.post("/add",upload.single("product_image"),async(req,res)=>{
   };
   let {filename: product_image}=req.file;
 
-  let {product_type,product_name, product_class,products_price,products_descripttion,products_unit} = req.body;
+  let {product_type,product_name, product_class,product_price,product_descripttion,product_unit} = req.body;
 
   if(!product_name || product_name.length<1){
       output.errors.product_name = '請輸入正確的商品名稱';
       return res.json(output);
   }
 
-  const sql = "INSERT INTO `products`(`product_type`,`product_name`, `product_class`,`products_price`,`products_descripttion`,`products_unit`,`product_image`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+  const sql = "INSERT INTO `products`(`product_type`,`product_name`, `product_class`,`product_price`,`product_descripttion`,`product_unit`,`product_image`) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-  const [result] = await db.query(sql,[product_type,product_name, product_class,products_price,products_descripttion,products_unit,product_image]);
+  const [result] = await db.query(sql,[product_type,product_name, product_class,product_price,product_descripttion,product_unit,product_image]);
 
   output.result = result;
   output.success = !! result.affectedRows;
@@ -135,7 +135,7 @@ router.put("/edit/:product_id",upload.none(),async(req,res)=>{
       return res.json(output);  //API不要用轉向
   }
 
-  const {product_type,product_name,product_class,products_price,products_descripttion,products_unit, product_image} = req.body;
+  const {product_type,product_name,product_class,product_price,product_descripttion,product_unit, product_image} = req.body;
   // const {filename: product_image}=req.file;
 
   if(!product_name || product_name.length<1){
@@ -145,9 +145,9 @@ router.put("/edit/:product_id",upload.none(),async(req,res)=>{
 
 
 
-  const sql = "UPDATE `products` SET `product_type`=?,`product_name`=?,`product_class`=?,`products_price`=?,`products_descripttion`=?,`products_unit`=?,`product_image`=? WHERE `product_id`=?";
+  const sql = "UPDATE `products` SET `product_type`=?,`product_name`=?,`product_class`=?,`product_price`=?,`product_descripttion`=?,`product_unit`=?,`product_image`=? WHERE `product_id`=?";
 
-  const [result] = await db.query(sql,[product_type,product_name,product_class,products_price,products_descripttion,products_unit,product_image,product_id])
+  const [result] = await db.query(sql,[product_type,product_name,product_class,product_price,product_descripttion,product_unit,product_image,product_id])
 
   output.result = result;
   output.success = !! result.changedRows;
