@@ -87,14 +87,14 @@ router.get('/add', async(req, res)=>{
   res.render('admin-add');
 });
 
-router.post('/add', upload.single('avatar'), async(req, res)=>{ 
+router.post('/add', upload.none(), async(req, res)=>{ 
   const output = {
     success:false,
     postData: req.body, //除錯用
     code:0,
     errors: {}
   };
-  let{filename: avatar}=req.file;
+  // let{filename: avatar}=req.file;
 
   let {name,email,mobile,birthday,address}=req.body; //解構
 
@@ -107,8 +107,8 @@ router.post('/add', upload.single('avatar'), async(req, res)=>{
   birthday = birthday.isValid() ? birthday.format('YYYY-MM-DD') : null;   //如果格式錯誤，填空值
 
   //TODO: 資料檢查
-    const sql = "INSERT INTO `member`(`name`, `email`,`mobile`, `birthday`, `address`, `avatar`,`created_at`)VALUES(?, ?, ?, ?, ?, ?, NOW())";
-  const [result] = await db.query(sql, [name, email , mobile, birthday, address, avatar]);
+    const sql = "INSERT INTO `member`(`name`, `email`,`mobile`, `birthday`, `address`,`created_at`)VALUES(?, ?, ?, ?, ?, ?, NOW())";
+  const [result] = await db.query(sql, [name, email , mobile, birthday, address]);
 
   output.result = result; 
   output.success = !!result.affectedRows; //轉成boolean (affectedRows 1 : true ; affectedRows 0 :false )
@@ -197,7 +197,7 @@ router.get('/edit/:mid', async(req, res)=>{
   // res.render('admin-edit', {...row, referer});  //展開->email、name..這些變數 
 });
 //http方法->使用put;  RESTful API 基本規定-> CRUD -> get/ post / 修改:put / delete
-router.put('/edit/:mid', upload.single('avatar'), async(req, res)=>{ 
+router.put('/edit/:mid', upload.none(), async(req, res)=>{ 
   const output = {   //定義要輸出資訊的格式
     success:false,
     postData: req.body, //除錯用
@@ -211,7 +211,7 @@ router.put('/edit/:mid', upload.single('avatar'), async(req, res)=>{
   }
 
   let {name,email,mobile,birthday,address,member_status}=req.body; //解構
-  const {filename: avatar} = req.file;
+  // const {filename: avatar} = req.file;
   // console.log(req.file);
 
 
@@ -225,8 +225,8 @@ router.put('/edit/:mid', upload.single('avatar'), async(req, res)=>{
   birthday = birthday.isValid() ? birthday.format('YYYY-MM-DD') : null;   //如果格式錯誤，填空值
 
   //TODO: 資料檢查
-    const sql = "UPDATE `member` SET `name`=?,`email`=?,`mobile`=?,`birthday`=?,`address`=?,`member_status`=?,`avatar`=? WHERE `mid`=?";
-  const [result] = await db.query(sql, [name, email, mobile, birthday, address, member_status, avatar, mid]);
+    const sql = "UPDATE `member` SET `name`=?,`email`=?,`mobile`=?,`birthday`=?,`address`=?,`member_status`=? WHERE `mid`=?";
+  const [result] = await db.query(sql, [name, email, mobile, birthday, address, member_status, mid]);
  
 
   output.result = result; 
@@ -321,7 +321,85 @@ router.get('/pet-list/:mid', async(req, res)=>{
   res.render('pet-list', {rows, referer});  //展開->name、birthday..這些變數 
 });
 
-//http方法->使用put;  RESTful API 基本規定-> CRUD -> get/ post / 修改:put / delete
+//加入收藏
+router.post('/toggle-like/:product_id', async (req, res)=>{
+  const output = {
+  success: false,
+  error: '',
+  action: '',
+  };
+  // 必須是已登入的會員
+  // if(! req.session.user){
+  // output.error = '必須登入會員, 才能加到最愛';
+  // return res.json(output);
+  // }
+  const product_id = +req.params.product_id || 0;
+  const {id: mid, typeID: type_id} = req.body
+
+  const sql1 = "SELECT * FROM product_likes WHERE `mid`=? AND `product_id`=? AND `type_id`=?";
+  const [likes] = await db.query(sql1, [mid, product_id, type_id]);
+
+  if(likes.length){
+  const sql2 = "DELETE FROM `product_likes` WHERE sid=" + likes[0].sid;
+  const [result] = await db.query(sql2);
+  output.success = !! result.affectedRows;
+  output.action = 'delete';
+  } else {
+// TODO: 判斷有沒有這個商品
+  const sql3 = "INSERT INTO `product_likes`(`mid`, `product_id`,`type_id`) VALUES (?,?,?)";
+  const [result] = await db.query(sql3, [
+     mid,product_id,type_id
+  ]);
+  output.success = !! result.affectedRows;
+  output.action = 'insert';
+  }
+  res.json(output);
+});
+
+//透過會員編號找到會員各自的收藏名單
+router.get('/likes/:mid', async (req, res)=>{
+  const output = {
+      logined: false, // 有沒有登入
+      error: '',
+      likes: [],
+  };
+  const mid = +req.params.mid || 0 ;
+  if(!mid){
+      return res.json(output);
+  }
+  output.logined = true;
+
+  const sql = "SELECT product_type.*, p.*, pl.*, member.mid FROM product_likes pl JOIN product p ON pl.product_id=p.product_id JOIN product_type ON product_type.type_id=pl.type_id JOIN member ON pl.mid=member.mid WHERE pl.mid=?";
+  const [rows] = await db.query(sql,[mid]);
+  output.likes = rows;
+
+  res.json(output);
+});
+
+//刪除收藏
+router.delete('/deleteLikes/:sid', async(req, res)=>{ 
+  const output = {
+    success:false,
+    error:''
+  }
+  const sid = +req.params.sid || 0 ;
+  // const product_id = +req.params.product_id ||0;
+  // const mid = +req.params.mid || 0 ;
+  // const product_id = +req.params.product_id ||0;
+
+  if(!sid){
+    output.error='沒有收藏編號'
+    return res.json(output);
+  }
+  // const sql1 = "SELECT * FROM product_likes WHERE `mid`=? AND `product_id`=?";
+  // const [likes] = await db.query(sql1, [mid, product_id]);
+  const sql2 = "DELETE FROM product_likes WHERE sid=?";
+  const [result] = await db.query(sql2,[sid]);
+  output.success = !! result.affectedRows;
+ 
+  res.json(output);
+ });
+
 
 //呈現會員表單(搭配getListData)
 router.get('/', async(req, res)=>{ 
