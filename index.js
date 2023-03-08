@@ -405,11 +405,11 @@ app.post('/order/:mid', async (req, res) => {
     // 取得剛才新增的訂單ID
     const order_id = addOrderResult.insertId
     const order_details = req.body.detailData || [];
-       const detailSql = 'INSERT INTO od_detail(order_id, product_id, type_id, products_quantity, products_price) VALUES ?'
+       const detailSql = 'INSERT INTO od_detail(order_id, product_id, type_id, product_quantity, product_price) VALUES ?'
        const values = order_details.map((v,i)=>{
-        const { product_id, product_type, products_quantity, products_price } = v
+        const { product_id, product_type, product_quantity, product_price } = v
          tid = product_type
-        return [order_id, product_id, product_type, products_quantity, products_price]
+        return [order_id, product_id, product_type, product_quantity, product_price]
        })
       const [addDetailResult] = await db.query(detailSql, [values])
 
