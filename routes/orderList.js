@@ -61,7 +61,7 @@ const getListData = async(req,res)=>{
         if(page>totalPages){
             return res.redirect("?page="+totalPages);  //頁面轉向到最後一頁
         }
-        // const sql = `SELECT * FROM products ${where} ${orderbySQL} LIMIT ${(page-1)*perPage},${perPage}`;
+        // const sql = `SELECT * FROM product ${where} ${orderbySQL} LIMIT ${(page-1)*perPage},${perPage}`;
         const sql = `SELECT od.* , od_detail.* FROM  od JOIN od_detail ON od.order_id=od_detail.order_id ${where} LIMIT ${(page-1)*perPage},${perPage}`;
         // SELECT activitypettype.* , activity.* FROM `activity` JOIN `activitypettype` ON activity.activity_pettype=activitypettype.activity_pettype WHERE activity_id=1;
         [rows] = await db.query(sql);
@@ -95,9 +95,9 @@ const getListData = async(req,res)=>{
 //         return res.json(output);
 //     }
 
-//     const sql = "INSERT INTO `products`(`product_type`,`product_name`, `product_class`,`products_price`,`products_descripttion`,`products_unit`) VALUES (?, ?, ?, ?, ?, ?)";
+//     const sql = "INSERT INTO `product`(`product_type`,`product_name`, `product_class`,`product_price`,`product_descripttion`,`product_unit`) VALUES (?, ?, ?, ?, ?, ?)";
 
-//     const [result] = await db.query(sql,[product_type,product_name, product_class,products_price,products_descripttion,products_unit])
+//     const [result] = await db.query(sql,[product_type,product_name, product_class,product_price,product_descripttion,product_unit])
 
 //     output.result = result;
 //     output.success = !! result.affectedRows;
@@ -172,7 +172,7 @@ router.get("/order/:member_id",async(req,res)=>{
         output.error.member_id = '沒有資料編號';
         return res.json(output);  //API不要用轉向
     }
-    const sql = "SELECT od.*, od_detail.`type_id`, od_detail.`products_price`, od_detail.`products_quantity` FROM od JOIN od_detail ON od.order_id = od_detail.order_id WHERE od.member_id = ? GROUP BY od.order_id";
+    const sql = "SELECT od.*, od_detail.`type_id`, od_detail.`product_price`, od_detail.`product_quantity` FROM od JOIN od_detail ON od.order_id = od_detail.order_id WHERE od.member_id = ? GROUP BY od.order_id";
     const [rows] = await db.query(sql,[member_id]);
     if(rows.length<1){
         return res.redirect(req.baseUrl); //轉向到列表頁
@@ -194,7 +194,7 @@ router.get('/orderDetail/:order_id',async(req,res)=>{
         output.error.order_id = '沒有資料編號';
         return res.json(output);  //API不要用轉向
     }
-    const sql = "SELECT od_detail.*, products.*, od.order_date, od.recipient_name, od.recipient_address, od.recipient_phone, od.payment_method FROM od_detail JOIN od ON od.order_id = od_detail.order_id JOIN products ON products.product_id = od_detail.products_id WHERE od_detail.order_id = ?";
+    const sql = "SELECT od_detail.*, product.*, od.order_date, od.recipient_name, od.recipient_address, od.recipient_phone, od.payment_method FROM od_detail JOIN od ON od.order_id = od_detail.order_id JOIN product ON product.product_id = od_detail.product_id WHERE od_detail.order_id = ?";
     const [rows] = await db.query(sql,[order_id]);
 
     if(rows.length<1){

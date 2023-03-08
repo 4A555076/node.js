@@ -369,7 +369,7 @@ router.get('/likes/:mid', async (req, res)=>{
   }
   output.logined = true;
 
-  const sql = "SELECT product_type.*, p.*, pl.*, member.mid FROM product_likes pl JOIN products p ON pl.product_id=p.product_id JOIN product_type ON product_type.type_id=pl.type_id JOIN member ON pl.mid=member.mid WHERE pl.mid=?";
+  const sql = "SELECT product_type.*, p.*, pl.*, member.mid FROM product_likes pl JOIN product p ON pl.product_id=p.product_id JOIN product_type ON product_type.type_id=pl.type_id JOIN member ON pl.mid=member.mid WHERE pl.mid=?";
   const [rows] = await db.query(sql,[mid]);
   output.likes = rows;
 

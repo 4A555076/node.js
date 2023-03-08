@@ -28,19 +28,19 @@
               <div class="form-text"></div>
             </div>
             <div class="mb-3">
-              <label for="products_price" class="form-label">商品價格</label>
-              <input type="number" class="form-control" id="products_price" name="products_price" value="<%= products_price %>">
+              <label for="product_price" class="form-label">商品價格</label>
+              <input type="number" class="form-control" id="product_price" name="product_price" value="<%= product_price %>">
               <div class="form-text"></div>
             </div>
             <div class="mb-3">
-              <label for="products_descripttion" class="form-label">商品說明 </label>
-              <textarea  class="form-control" id="products_descripttion" name="products_descripttion" cols="30" rows="6"><%= products_descripttion%></textarea>
-              <!-- <textarea  class="form-control" id="products_descripttion2" name="products_descripttion" cols="30" rows="6"><%= products_descripttion%></textarea> -->
+              <label for="product_descripttion" class="form-label">商品說明 </label>
+              <textarea  class="form-control" id="product_descripttion" name="product_descripttion" cols="30" rows="6"><%= product_descripttion%></textarea>
+              <!-- <textarea  class="form-control" id="product_descripttion2" name="product_descripttion" cols="30" rows="6"><%= product_descripttion%></textarea> -->
               <div class="form-text"></div>
             </div>
              <div class="mb-3">
-              <label for="products_unit" class="form-label">販售單位</label>
-              <input type="text" class="form-control" id="products_unit" name="products_unit" value="<%= products_unit %>">
+              <label for="product_unit" class="form-label">販售單位</label>
+              <input type="text" class="form-control" id="product_unit" name="product_unit" value="<%= product_unit %>">
               <div class="form-text"></div>
             </div>
             <div class="mb-3">
@@ -63,9 +63,9 @@
 <script>
   const referer = <%- JSON.stringify(referer)%>
   const locals = <%- JSON.stringify(locals)%> 
-  // const productsDescripttion1 = document.getElementById('products_descripttion1').value
-  // const productsDescripttion2 = document.getElementById('products_descripttion2').value
-  // const productsDescripttion = `<p>${productsDescripttion1}</p><p>${productsDescripttion2}</p>`
+  // const productDescripttion1 = document.getElementById('product_descripttion1').value
+  // const productDescripttion2 = document.getElementById('product_descripttion2').value
+  // const productDescripttion = `<p>${productDescripttion1}</p><p>${productDescripttion2}</p>`
 
   function sendForm(event){
     event.preventDefault();
