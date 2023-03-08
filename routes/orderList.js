@@ -8,10 +8,10 @@ const router = express.Router();
 
 //針對此模組的頂層 ; 經過路由前，會先經過此middleware
 //url, baseUrl, originalUrl 要在這裡拿，若在index那裡拿，originalUrl會一樣，但url & baseUrl會不同 
-router.use((req,res,next)=>{
-    const {url,baseUrl,originalUrl} = req;
+router.use((req, res, next) => {
+    const { url, baseUrl, originalUrl } = req;
 
-    res.locals = {...res.locals,url,baseUrl,originalUrl};
+    res.locals = { ...res.locals, url, baseUrl, originalUrl };
     //不能使用-> res.locals.url = url (會將先前在index設定的middleware排除)
     // if(! req.session.user){  //如果沒有登入會員,就看不到新增會員表單
     //     req.session.lastPage = req.originalUrl;  
@@ -22,12 +22,12 @@ router.use((req,res,next)=>{
 });
 
 //訂單紀錄
-const getListData = async(req,res)=>{
+const getListData = async (req, res) => {
 
     let page = +req.query.page || 1;   //用戶要看第幾頁
 
-    if(page<1){
-        return res.redirect(req.baseUrl+req.url);
+    if (page < 1) {
+        return res.redirect(req.baseUrl + req.url);
     }
 
     //關鍵字搜尋
@@ -36,33 +36,33 @@ const getListData = async(req,res)=>{
     let orderby = req.query.orderby || '';
 
 
-    if(search){
+    if (search) {
         const esc_search = db.escape(`%${search}%`);  //sql跳脫單引號
-        console.log({esc_search});
+        console.log({ esc_search });
         where += `AND \`member_id\` LIKE ${esc_search} `;
     }
 
     let orderbySQL = 'ORDER BY order_id ASC'; //預設值(編號升冪)
-  switch(orderby){
-    case 'order_id_desc':
-      orderbySQL = 'ORDER BY order_id DESC';
-      break;
-  }
+    switch (orderby) {
+        case 'order_id_desc':
+            orderbySQL = 'ORDER BY order_id DESC';
+            break;
+    }
 
 
     const perPage = 5;
-    const t_sql =`SELECT COUNT(1) totalRows FROM od ${where}`;
-    const [[{totalRows}]] = await db.query(t_sql);
+    const t_sql = `SELECT COUNT(1) totalRows FROM od ${where}`;
+    const [[{ totalRows }]] = await db.query(t_sql);
 
-    const totalPages = Math.ceil(totalRows/perPage);
+    const totalPages = Math.ceil(totalRows / perPage);
 
     let rows = [];
-    if(totalRows>0){
-        if(page>totalPages){
-            return res.redirect("?page="+totalPages);  //頁面轉向到最後一頁
+    if (totalRows > 0) {
+        if (page > totalPages) {
+            return res.redirect("?page=" + totalPages);  //頁面轉向到最後一頁
         }
-        // const sql = `SELECT * FROM products ${where} ${orderbySQL} LIMIT ${(page-1)*perPage},${perPage}`;
-        const sql = `SELECT od.* , od_detail.* FROM  od JOIN od_detail ON od.order_id=od_detail.order_id ${where} LIMIT ${(page-1)*perPage},${perPage}`;
+        // const sql = `SELECT * FROM product ${where} ${orderbySQL} LIMIT ${(page-1)*perPage},${perPage}`;
+        const sql = `SELECT od.* , od_detail.* FROM  od JOIN od_detail ON od.order_id=od_detail.order_id ${where} LIMIT ${(page - 1) * perPage},${perPage}`;
         // SELECT activitypettype.* , activity.* FROM `activity` JOIN `activitypettype` ON activity.activity_pettype=activitypettype.activity_pettype WHERE activity_id=1;
         [rows] = await db.query(sql);
     }
@@ -71,7 +71,7 @@ const getListData = async(req,res)=>{
     // filter type={?} 
 
 
-    return {totalRows,totalPages,page,rows};
+    return { totalRows, totalPages, page, rows };
 }
 
 
@@ -95,9 +95,9 @@ const getListData = async(req,res)=>{
 //         return res.json(output);
 //     }
 
-//     const sql = "INSERT INTO `products`(`product_type`,`product_name`, `product_class`,`products_price`,`products_descripttion`,`products_unit`) VALUES (?, ?, ?, ?, ?, ?)";
+//     const sql = "INSERT INTO `product`(`product_type`,`product_name`, `product_class`,`product_price`,`product_descripttion`,`product_unit`) VALUES (?, ?, ?, ?, ?, ?)";
 
-//     const [result] = await db.query(sql,[product_type,product_name, product_class,products_price,products_descripttion,products_unit])
+//     const [result] = await db.query(sql,[product_type,product_name, product_class,product_price,product_descripttion,product_unit])
 
 //     output.result = result;
 //     output.success = !! result.affectedRows;
@@ -122,7 +122,7 @@ const getListData = async(req,res)=>{
 
 //     //從哪裡來
 //     const referer = req.get('Referer') || req.baseUrl;
-    
+
 //     res.render("order-edit",{...row,referer});
 // });
 
@@ -160,21 +160,21 @@ const getListData = async(req,res)=>{
 // });
 
 // 取得該會員的所有訂單紀錄
-router.get("/order/:member_id",async(req,res)=>{
+router.get("/order/:member_id", async (req, res) => {
     const output = {
-        success:false,
-        postData:req.body,
-        code:0,
-        errors:{},
+        success: false,
+        postData: req.body,
+        code: 0,
+        errors: {},
     };
-    const member_id = +req.params.member_id ||0;
-    if(!member_id){
+    const member_id = +req.params.member_id || 0;
+    if (!member_id) {
         output.error.member_id = '沒有資料編號';
         return res.json(output);  //API不要用轉向
     }
-    const sql = "SELECT od.*, od_detail.`type_id`, od_detail.`products_price`, od_detail.`products_quantity` FROM od JOIN od_detail ON od.order_id = od_detail.order_id WHERE od.member_id = ? GROUP BY od.order_id";
-    const [rows] = await db.query(sql,[member_id]);
-    if(rows.length<1){
+    const sql = "SELECT od.*, od_detail.`type_id`, od_detail.`product_price`, od_detail.`product_quantity` FROM od JOIN od_detail ON od.order_id = od_detail.order_id WHERE od.member_id = ? GROUP BY od.order_id";
+    const [rows] = await db.query(sql, [member_id]);
+    if (rows.length < 1) {
         return res.redirect(req.baseUrl); //轉向到列表頁
     }
     // const row = rows[0];
@@ -182,22 +182,24 @@ router.get("/order/:member_id",async(req,res)=>{
 
 })
 //取得某一筆的訂單明細
-router.get('/orderDetail/:order_id',async(req,res)=>{
+router.get('/orderDetail/:order_id', async (req, res) => {
     const output = {
-        success:false,
-        postData:req.body,
-        code:0,
-        errors:{},
+        success: false,
+        postData: req.body,
+        code: 0,
+        errors: {},
     };
-    const order_id = +req.params.order_id ||0;
-    if(!order_id){
+    const order_id = +req.params.order_id || 0;
+    if (!order_id) {
         output.error.order_id = '沒有資料編號';
         return res.json(output);  //API不要用轉向
     }
-    const sql = "SELECT od_detail.*, products.*, od.order_date, od.recipient_name, od.recipient_address, od.recipient_phone, od.payment_method FROM od_detail JOIN od ON od.order_id = od_detail.order_id JOIN products ON products.product_id = od_detail.products_id WHERE od_detail.order_id = ?";
-    const [rows] = await db.query(sql,[order_id]);
+    const sql = `SELECT od_detail.*, product.*, od.order_date, od.recipient_name, od.recipient_address, od.recipient_phone, od.payment_method 
+            FROM od_detail JOIN od ON od.order_id = od_detail.order_id 
+            JOIN product ON product.product_id = od_detail.product_id WHERE od_detail.order_id = ?`;
+    const [rows] = await db.query(sql, [order_id]);
 
-    if(rows.length<1){
+    if (rows.length < 1) {
         return res.redirect(req.baseUrl); //轉向到列表頁
     }
     // const row = rows[0];
@@ -207,33 +209,33 @@ router.get('/orderDetail/:order_id',async(req,res)=>{
 
 
 
-router.get("/",async(req,res)=>{
-    const output = await getListData(req,res);
-    res.render('orderList',output);
+router.get("/", async (req, res) => {
+    const output = await getListData(req, res);
+    res.render('orderList', output);
 });
 
-router.get("/api",async(req,res)=>{
-    const output = await getListData(req,res);
+router.get("/api", async (req, res) => {
+    const output = await getListData(req, res);
     res.json(output);
 });
 
-router.delete("/:order_id",async(req,res)=>{
+router.delete("/:order_id", async (req, res) => {
     const output = {
-        success:false,
-        error:'',
+        success: false,
+        error: '',
     }
 
-    const order_id = +req.params.order_id ||0;
-    if(!order_id){
+    const order_id = +req.params.order_id || 0;
+    if (!order_id) {
         output.error = 'order_id';
         return res.json(output);
     }
     const sql = "DELETE FROM `od` WHERE order_id=?";
-    const [result] = await db.query(sql,[order_id]);
+    const [result] = await db.query(sql, [order_id]);
 
-    output.success = !! result.affectedRows;
+    output.success = !!result.affectedRows;
     res.json(output);
 
 });
 
-module.exports=router;
+module.exports = router;
