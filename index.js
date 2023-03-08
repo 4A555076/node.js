@@ -208,8 +208,13 @@ app.post("/auth/register", upload.none(), async (req, res) => {
   //   })
   //   }
 })
-
-
+// 前端取得某個會員資料的api
+app.get('/member/:mid?', async (req, res) => {
+  const mid = +req.params.mid || 0;
+  const sql = 'SELECT * FROM member WHERE mid=?';
+  const [result] = await db.query(sql, [mid])
+  res.json(result)
+})
 
 
 //新增會員資料
@@ -376,13 +381,82 @@ app.get('/uploads/:fileName', (req, res) => {
   res.sendFile(filePath);
 });
 
+app.post('/order/:mid', async (req, res) => {
+    const mid = +req.params.mid || 0
+    if (mid == null) {
+      return res.json({ success: false, message: 'Member is undefined' })
+    }
+    // console.log(req.body)
+    const member_id = mid
+    const status = 0
+    const {
+      payment_method,
+      recipient_name,
+      recipient_address,
+      recipient_phone,
+      detailData,
+    } = req.body;
+    const order_date = moment.tz('Asia/Taipei').format('YYYY-MM-DD HH:mm:ss')
+    let aid=0
+    let tid=0
+    try {
+    const sql = 'INSERT INTO od(member_id, status, payment_method, order_date, recipient_name, recipient_address, recipient_phone) VALUES(?, ?, ?, ?, ?, ?, ?)'
+    const [addOrderResult] = await db.query(sql, [member_id, status, payment_method, order_date, recipient_name, recipient_address, recipient_phone])
+    // 取得剛才新增的訂單ID
+    const order_id = addOrderResult.insertId
+    const order_details = req.body.detailData || [];
+       const detailSql = 'INSERT INTO od_detail(order_id, product_id, type_id, products_quantity, products_price) VALUES ?'
+       const values = order_details.map((v,i)=>{
+        const { product_id, product_type, products_quantity, products_price } = v
+         tid = product_type
+        return [order_id, product_id, product_type, products_quantity, products_price]
+       })
+      const [addDetailResult] = await db.query(detailSql, [values])
+
+      console.log(addDetailResult)
+      aid = addDetailResult.insertId
+      // tid = addDetailResult.product_type
+    // for (const orderDetail of order_details) {
+    //   const { product_id, product_type, products_quantity, products_price } = orderDetail
+    //   const type_id = product_type
+    //   const detailSql = 'INSERT INTO od_detail(order_id, product_id, type_id, products_quantity, products_price) VALUES (?,?,?,?,?)'
+    //   const [addDetailResult] = await db.query(detailSql, [order_id, product_id, type_id, products_quantity, products_price])
+    //   if (!addDetailResult.affectedRows) {
+    //     console.log(addDetailResult);
+    //     throw new Error("Failed to add order detail");
+    //   }
+    // }
+  }catch (error) {
+    res.json({ success: false, message: error.message })
+    }
+      try{
+      // 取得Detail裡的type_id
+      const detailId = aid
+      // 判斷是否新增Validity Period資料表
+      if (tid == 1 || 2) {
+        //return addDetailResult;
+        return res.json({ success: true, message: 'Order details added successfully' });
+      } else if (tid == 3 || 4) {
+        const addValidityPeriodSql = 'INSERT INTO validity_period(order_detail_id, start_time,end_time, additional) VALUES (?,?,?,?)'
+        const [addValidityPeriodResult] = await db.query(addValidityPeriodSql, [detailId, start_time, end_time, additional])
+        return addValidityPeriodResult;
+        } else {
+        throw new Error("TypeID is undefined");
+        }
+      res.json({ success: true, message: 'Order details added successfully' });
+    } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+
 
 //baseUrl
 app.use('/member', require('./routes/member'));
-app.use('/orderList',require('./routes/orderList'));
+app.use('/orderList', require('./routes/orderList'));
 app.use('/activity', require('./routes/activity'));
 app.use('/product', require('./routes/product'));
-app.use('/room',require('./routes/room'));
+app.use('/room', require('./routes/room'));
 // 前端讀取圖片時使用的URL
 app.use('/uploads/:fileName?', express.static(__dirname + '/public/uploads'));
 
