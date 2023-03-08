@@ -45,7 +45,7 @@ switch(orderby){
 
 
   const perPage = 5;
-  const t_sql = `SELECT COUNT(1) totalRows FROM products ${where}`;
+  const t_sql = `SELECT COUNT(1) totalRows FROM product ${where}`;
   const [[{totalRows}]] = await db.query(t_sql);
 
   const totalPages = Math.ceil(totalRows/perPage);
@@ -56,7 +56,7 @@ switch(orderby){
           return res.redirect("?page="+totalPages);  //頁面轉向到最後一頁
       }
 
-      const sql = `SELECT product_type.* , products.* FROM  products JOIN product_type ON products.product_type=product_type.type_id ${where} ${orderbySQL} LIMIT ${(page-1)*perPage},${perPage}`;
+      const sql = `SELECT product_type.* , product.* FROM  product JOIN product_type ON product.product_type=product_type.type_id ${where} ${orderbySQL} LIMIT ${(page-1)*perPage},${perPage}`;
       [rows] = await db.query(sql);
   }
 
@@ -84,7 +84,7 @@ router.post("/add",upload.single("product_image"),async(req,res)=>{
       return res.json(output);
   }
 
-  const sql = "INSERT INTO `products`(`product_type`,`product_name`, `product_class`,`product_price`,`product_descripttion`,`product_unit`,`product_image`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+  const sql = "INSERT INTO `product`(`product_type`,`product_name`, `product_class`,`product_price`,`product_descripttion`,`product_unit`,`product_image`) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
   const [result] = await db.query(sql,[product_type,product_name, product_class,product_price,product_descripttion,product_unit,product_image]);
 
@@ -105,7 +105,7 @@ router.get("/edit/:product_id",async(req,res)=>{
       return res.redirect(req.baseUrl); //轉向到列表頁
   }
 
-  const sql = "SELECT * FROM products WHERE product_id=?";
+  const sql = "SELECT * FROM product WHERE product_id=?";
   const [rows] = await db.query(sql,[product_id]);
   if(rows.length<1){
       return res.redirect(req.baseUrl); //轉向到列表頁
@@ -145,7 +145,7 @@ router.put("/edit/:product_id",upload.none(),async(req,res)=>{
 
 
 
-  const sql = "UPDATE `products` SET `product_type`=?,`product_name`=?,`product_class`=?,`product_price`=?,`product_descripttion`=?,`product_unit`=?,`product_image`=? WHERE `product_id`=?";
+  const sql = "UPDATE `product` SET `product_type`=?,`product_name`=?,`product_class`=?,`product_price`=?,`product_descripttion`=?,`product_unit`=?,`product_image`=? WHERE `product_id`=?";
 
   const [result] = await db.query(sql,[product_type,product_name,product_class,product_price,product_descripttion,product_unit,product_image,product_id])
 
@@ -172,7 +172,7 @@ router.get("/list-product/:product_type",async(req,res)=>{
       return res.redirect(req.baseUrl); //轉向到列表頁
   }
 
-  const sql = "SELECT * FROM products WHERE product_type=?";
+  const sql = "SELECT * FROM product WHERE product_type=?";
   const [rows] = await db.query(sql,[product_type]);
   res.json(rows);
 
@@ -185,7 +185,7 @@ router.get("/list-detail/:product_id",async(req,res)=>{
       return res.redirect(req.baseUrl); //轉向到列表頁
   }
 
-  const sql = "SELECT * FROM products WHERE product_id=?";
+  const sql = "SELECT * FROM product WHERE product_id=?";
   const [rows] = await db.query(sql,[product_id]);
   res.json(rows);
 
@@ -202,7 +202,7 @@ router.delete("/:product_id",async(req,res)=>{
       output.error = 'product_id';
       return res.json(output);
   }
-  const sql = "DELETE FROM `products` WHERE product_id=?";
+  const sql = "DELETE FROM `product` WHERE product_id=?";
   const [result] = await db.query(sql,[product_id]);
 
   output.success = !! result.affectedRows;
