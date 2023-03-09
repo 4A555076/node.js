@@ -418,17 +418,6 @@ app.post('/order/:mid', async (req, res) => {
 
     console.log(addDetailResult)
     aid = addDetailResult.insertId
-    // tid = addDetailResult.product_type
-    // for (const orderDetail of order_details) {
-    //   const { product_id, product_type, products_quantity, products_price } = orderDetail
-    //   const type_id = product_type
-    //   const detailSql = 'INSERT INTO od_detail(order_id, product_id, type_id, products_quantity, products_price) VALUES (?,?,?,?,?)'
-    //   const [addDetailResult] = await db.query(detailSql, [order_id, product_id, type_id, products_quantity, products_price])
-    //   if (!addDetailResult.affectedRows) {
-    //     console.log(addDetailResult);
-    //     throw new Error("Failed to add order detail");
-    //   }
-    // }
   } catch (error) {
     console.log(error)
     return res.json({ success: false, message: error.message })
