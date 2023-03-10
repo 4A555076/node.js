@@ -32,6 +32,7 @@
               <th scope="col">房間名稱</th>
               <th scope="col">房間類型</th>
               <th scope="col">房間價格</th>
+              <th scope="col">房間說明</th>
               <th scope="col">販售單位</th>
               <th scope="col">刪除</th>
               <th scope="col">修改</th>
@@ -45,8 +46,9 @@
               <td><img src="/<%= r.product_image %>" width="200" class="product_image"></td>
               <td><%=r.product_name %></td>
               <td><%=r.product_class %></td>
-              <td><%=r.products_price %></td>
-              <td><%=r.products_unit %></td>
+              <td><%=r.product_price %></td>
+              <td><%=r.product_descripttion %></td>
+              <td><%=r.product_unit %></td>
                <td>
               <a href="javascript:deleteItem(<%= r.product_id%>)">
                 <i class="fa-solid fa-trash"></i>

@@ -2,6 +2,7 @@ const express = require('express');
 const db = require('../modules/connect-mysql');
 const upload = require('../modules/upload-img');
 const moment = require('moment-timezone');
+const { route } = require('./member');
 
 const router = express.Router();
 
@@ -12,10 +13,10 @@ router.use((req,res,next)=>{
 
     res.locals = {...res.locals,url,baseUrl,originalUrl};
     //不能使用-> res.locals.url = url (會將先前在index設定的middleware排除)
-    if(! req.session.user){  //如果沒有登入會員,就看不到新增會員表單
-        req.session.lastPage = req.originalUrl;  
-        return res.redirect('/login');
-    }
+    // if(! req.session.user){  //如果沒有登入會員,就看不到新增會員表單
+    //     req.session.lastPage = req.originalUrl;  
+    //     return res.redirect('/login');
+    // }
 
     next();
 });
@@ -61,7 +62,7 @@ const getListData = async(req,res)=>{
   }
 
 
-    const perPage = 5;
+    const perPage = 20;
     const t_sql = `SELECT COUNT(1) totalRows FROM activity ${where}`;
     const [[{totalRows}]] = await db.query(t_sql);
 
@@ -97,16 +98,16 @@ router.post("/add",upload.single("activity_image"),async(req,res)=>{
 
     let {filename: activity_image}=req.file;
 
-    let {activity_name,activity_datestart, activity_dateend,activity_pettype,activity_location,activity_decription, activity_notice} = req.body;
+    let {activity_name,activity_datestart, activity_dateend,activity_pettype,activity_location,activity_time,activity_decription, activity_notice,activity_notice2} = req.body;
 
     if(!activity_name || activity_name.length<1){
         output.errors.activity_name = '請輸入正確的活動名稱';
         return res.json(output);
     }
 
-    const sql = "INSERT INTO `activity`(`activity_name`,`activity_datestart`, `activity_dateend`,`activity_pettype`,`activity_location`,`activity_decription`, `activity_notice`,`activity_image`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    const sql = "INSERT INTO `activity`(`activity_name`,`activity_datestart`, `activity_dateend`,`activity_pettype`,`activity_location`,`activity_time`,`activity_decription`, `activity_notice`,`activity_notice2`,`activity_image`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    const [result] = await db.query(sql,[activity_name,activity_datestart, activity_dateend,activity_pettype,activity_location,activity_decription, activity_notice,activity_image])
+    const [result] = await db.query(sql,[activity_name,activity_datestart, activity_dateend,activity_pettype,activity_location,activity_time,activity_decription, activity_notice,activity_notice2,activity_image])
 
     output.result = result;
     output.success = !! result.affectedRows;
@@ -151,7 +152,7 @@ router.put("/edit/:activity_id",upload.single("activity_image"),async(req,res)=>
         return res.json(output);  //API不要用轉向
     }
 
-    const {activity_name,activity_datestart,activity_dateend,activity_pettype,activity_location,activity_decription,activity_notice} = req.body;
+    const {activity_name,activity_datestart,activity_dateend,activity_pettype,activity_location,activity_time,activity_decription,activity_notice,activity_notice2} = req.body;
 
     const {filename: activity_image}=req.file;
 
@@ -160,9 +161,9 @@ router.put("/edit/:activity_id",upload.single("activity_image"),async(req,res)=>
         return res.json(output);
     }
 
-    const sql = "UPDATE `activity` SET `activity_name`=?,`activity_datestart`=?,`activity_dateend`=?,`activity_pettype`=?,`activity_location`=?,`activity_decription`=?,`activity_notice`=?,`activity_image`=? WHERE `activity_id`=?";
+    const sql = "UPDATE `activity` SET `activity_name`=?,`activity_datestart`=?,`activity_dateend`=?,`activity_pettype`=?,`activity_location`=?,`activity_time`=?,`activity_decription`=?,`activity_notice`=?,`activity_notice2`=?,`activity_image`=? WHERE `activity_id`=?";
 
-    const [result] = await db.query(sql,[activity_name,activity_datestart,activity_dateend,activity_pettype,activity_location,activity_decription,activity_notice,activity_image,activity_id])
+    const [result] = await db.query(sql,[activity_name,activity_datestart,activity_dateend,activity_pettype,activity_location,activity_time,activity_decription,activity_notice,activity_notice2,activity_image,activity_id])
 
     output.result = result;
     output.success = !! result.changedRows;
@@ -183,6 +184,94 @@ router.get("/api",async(req,res)=>{
       }
     res.json(output);
 });
+
+router.get("/activitydetail/:activity_id",async(req,res)=>{
+    const output = {
+        success:false,
+        postData:req.body,
+        code:0,
+        errors:{},
+    };
+    const activity_id = +req.params.activity_id ||0;
+    if(!activity_id){
+        output.error.activity_id = '沒有資料編號';
+        return res.json(output);  //API不要用轉向
+    }
+    const sql = "SELECT * FROM activity WHERE activity_id=?";
+    const [rows] = await db.query(sql,[activity_id]);
+    if(rows.length<1){
+        return res.redirect(req.baseUrl); //轉向到列表頁
+    }
+    // const row = rows[0];
+    res.json(rows[0]);
+});
+
+//活動報名
+router.post('/addForm', upload.none(), async(req, res)=>{ 
+    const output = {
+      success:false,
+      postData: req.body, //除錯用
+      code:0,
+      errors: {}
+    };
+  
+    console.log(output);
+    // return res.json(output)
+  
+   
+    let {mid, pets, activity_id} = req.body;
+    const sql = "INSERT INTO `activityform`(`activityform_time`, `mid`, `activity_id`, `pet_id`) VALUES (NOW(), ?, ?, ?)"
+    const [result] = await db.query(sql, [mid, activity_id, pets])
+  
+    output.result = result; 
+    output.success = !!result.affectedRows;
+  
+    res.json(output);
+  })
+
+//取得該會員的所有預約活動紀錄
+router.get("/activitysignupform/:mid",async(req,res)=>{
+    const output = {
+        success:false,
+        postData:req.body,
+        code:0,
+        errors:{},
+    };
+    const mid = +req.params.mid ||0;
+    if(!mid){
+        output.error.mid = '沒有資料編號';
+        return res.json(output);  //API不要用轉向
+    }
+    const sql = "SELECT activity.*,activityform.*,pet.*,member.* FROM activityform JOIN activity ON activityform.activity_id=activity.activity_id JOIN pet ON pet.pet_id=activityform.pet_id JOIN member ON member.mid=activityform.mid WHERE activityform.mid=?";
+    const [rows] = await db.query(sql,[mid]);
+    // if(rows.length<1){
+    //     return res.redirect(req.baseUrl); //轉向到列表頁
+    // }
+    // const row = rows[0];
+    res.json(rows);
+})
+
+//取得某一筆預約活動的明細
+router.get("/activitysignupformlist/:activityform_id",async(req,res)=>{
+    const output = {
+        success:false,
+        postData:req.body,
+        code:0,
+        errors:{},
+    };
+    const activityform_id = +req.params.activityform_id ||0;
+    if(!activityform_id){
+        output.error.activityform_id = '沒有資料編號';
+        return res.json(output);  //API不要用轉向
+    }
+    const sql = "SELECT activity.*,activityform.*,pet.*,member.* FROM activityform JOIN activity ON activityform.activity_id=activity.activity_id JOIN pet ON pet.pet_id=activityform.pet_id JOIN member ON member.mid=activityform.mid WHERE activityform.activityform_id=?";
+    const [rows] = await db.query(sql,[activityform_id]);
+    // if(rows.length<1){
+    //     return res.redirect(req.baseUrl); //轉向到列表頁
+    // }
+    // const row = rows[0];
+    res.json(rows[0]);
+})
 
 router.delete("/:activity_id",async(req,res)=>{
     const output = {

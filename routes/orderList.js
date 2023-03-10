@@ -159,7 +159,7 @@ const getListData = async(req,res)=>{
 //     res.json(output);
 // });
 
-//透過會員編號找到各自的訂單紀錄
+// 取得該會員的所有訂單紀錄
 router.get("/order/:member_id",async(req,res)=>{
     const output = {
         success:false,
@@ -172,7 +172,7 @@ router.get("/order/:member_id",async(req,res)=>{
         output.error.member_id = '沒有資料編號';
         return res.json(output);  //API不要用轉向
     }
-    const sql = "SELECT od.*,od_detail.* FROM od JOIN od_detail ON od.order_id=od_detail.order_id WHERE member_id=?";
+    const sql = "SELECT od.*, od_detail.`type_id`, od_detail.`product_price`, od_detail.`product_quantity` FROM od JOIN od_detail ON od.order_id = od_detail.order_id WHERE od.member_id = ? GROUP BY od.order_id";
     const [rows] = await db.query(sql,[member_id]);
     if(rows.length<1){
         return res.redirect(req.baseUrl); //轉向到列表頁
@@ -181,21 +181,21 @@ router.get("/order/:member_id",async(req,res)=>{
     res.json(rows);
 
 })
-//訂單明細
-router.get('/orderDetail/:order_detail_id',async(req,res)=>{
+//取得某一筆的訂單明細
+router.get('/orderDetail/:order_id',async(req,res)=>{
     const output = {
         success:false,
         postData:req.body,
         code:0,
         errors:{},
     };
-    const order_detail_id = +req.params.order_detail_id ||0;
-    if(!order_detail_id){
-        output.error.order_detail_id = '沒有資料編號';
+    const order_id = +req.params.order_id ||0;
+    if(!order_id){
+        output.error.order_id = '沒有資料編號';
         return res.json(output);  //API不要用轉向
     }
-    const sql = "SELECT * FROM od JOIN od_detail ON od.order_id=od_detail.order_id JOIN products.* ON od_detail.products_id = products.product_id WHERE od_detail.oder_detail_id=?";
-    const [rows] = await db.query(sql,[order_detail_id]);
+    const sql = "SELECT od_detail.*, product.*, od.order_date, od.recipient_name, od.recipient_address, od.recipient_phone, od.payment_method FROM od_detail JOIN od ON od.order_id = od_detail.order_id JOIN product ON product.product_id = od_detail.product_id WHERE od_detail.order_id = ?";
+    const [rows] = await db.query(sql,[order_id]);
 
     if(rows.length<1){
         return res.redirect(req.baseUrl); //轉向到列表頁
@@ -204,6 +204,8 @@ router.get('/orderDetail/:order_detail_id',async(req,res)=>{
     res.json(rows);
 
 })
+
+
 
 router.get("/",async(req,res)=>{
     const output = await getListData(req,res);
