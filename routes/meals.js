@@ -2,15 +2,15 @@ const express = require('express');
 const db = require('../modules/connect-mysql');
 const upload = require('../modules/upload-img');
 // const moment = require('moment-timezone');
-
 const router = express.Router();
 
-//針對此模組的頂層 ; 經過路由前，會先經過此middleware
-//url, baseUrl, originalUrl 要在這裡拿，若在index那裡拿，originalUrl會一樣，但url & baseUrl會不同 
 router.use((req,res,next)=>{
     const {url,baseUrl,originalUrl} = req;
 
     res.locals = {...res.locals,url,baseUrl,originalUrl};
+
+//針對此模組的頂層 ; 經過路由前，會先經過此middleware
+//url, baseUrl, originalUrl 要在這裡拿，若在index那裡拿，originalUrl會一樣，但url & baseUrl會不同 
     //不能使用-> res.locals.url = url (會將先前在index設定的middleware排除)
     // if(! req.session.user){  //如果沒有登入會員,就看不到新增會員表單
     //     req.session.lastPage = req.originalUrl;  
@@ -29,7 +29,7 @@ const getListData = async(req,res)=>{
     }
 
     //關鍵字搜尋
-    let where = ' WHERE 1 ';
+    let where = ' WHERE product_type = 4 ';
     let search = req.query.search || '';
     let orderby = req.query.orderby || '';
 
@@ -69,7 +69,7 @@ const getListData = async(req,res)=>{
 
 
 router.get("/add",async(req,res)=>{
-    res.render("product-add");
+    res.render("meals-add");
 });
 
 router.post("/add",upload.single("product_image"),async(req,res)=>{
@@ -117,7 +117,7 @@ router.get("/edit/:product_id",async(req,res)=>{
     //從哪裡來
     const referer = req.get('Referer') || req.baseUrl;
     
-    res.render("product-edit",{...row,referer});
+    res.render("meals-edit",{...row,referer});
 });
 
 router.put("/edit/:product_id",upload.single("product_image"),async(req,res)=>{
@@ -158,7 +158,7 @@ router.put("/edit/:product_id",upload.single("product_image"),async(req,res)=>{
 
 router.get("/",async(req,res)=>{
     const output = await getListData(req,res);
-    res.render('product-list',output);
+    res.render('meals-list',output);
 });
 
 router.get("/api",async(req,res)=>{
