@@ -8,61 +8,33 @@
         <i class="fa-solid fa-plus"></i>
       </a>
     </div>
-    <div class="col-4">
-      <select class="form-select" id="orderby" onchange="changeParams()">
-        <option value="product_id_asc">預設(編號升冪)</option>
-        <option value="product_id_desc">編號降冪</option>
-      </select>
-    </div>
-    <div class="col-4">
-      <form class="d-flex" role="search" onsubmit="changeParams(event)">
-        <input
-          class="form-control me-2"
-          type="search"
-          name="search"
-          placeholder="Search"
-        />
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <table class="table table-bordered table-striped">
-        <thead>
-          <tr>
-            <th scope="col">商品編號</th>
-            <th scope="col">分類</th>
-            <th scope="col">商品圖片</th>
-            <th scope="col">商品名稱</th>
-            <th scope="col">商品類型</th>
-            <th scope="col">商品價格</th>
-            <th scope="col">販售單位</th>
-            <th scope="col">刪除</th>
-            <th scope="col">修改</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% for(let r of rows){ %>
-          <!--這邊不輸出，所以不加-或=-->
-          <tr>
-            <td><%=r.product_id %></td>
-            <td>
-              <%=r.product_type==1 ? '商品' : r.product_type==2 ? '課程' :
-              r.product_type==3 ? '住宿' : '餐點' %>
-            </td>
-            <td>
-              <img
-                src="/<%= r.product_image %>"
-                width="200"
-                class="product_image"
-              />
-            </td>
-            <td><%=r.product_name %></td>
-            <td><%=r.product_class %></td>
-            <td><%=r.product_price %></td>
-            <td><%=r.product_unit %></td>
-            <td>
+    <div class="row">
+      <div class="col">
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th scope="col">商品編號</th>
+              <th scope="col">分類</th>
+              <th scope="col">商品圖片</th>
+              <th scope="col">商品名稱</th>
+              <th scope="col">商品類型</th>
+              <th scope="col">商品價格</th>
+              <th scope="col">販售單位</th>
+              <th scope="col">刪除</th>
+              <th scope="col">修改</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for(let r of rows){ %>  <!--這邊不輸出，所以不加-或=-->
+            <tr>
+              <td><%=r.product_id %></td>
+              <td><%=r.product_type==1 ? '商品' : r.product_type==2 ? '課程' : r.product_type==3 ? '住宿' : '餐點'  %></td>
+              <td><img src="/<%= r.product_image %>" width="200" class="product_image"></td>
+              <td><%=r.product_name %></td>
+              <td><%=r.product_class %></td>
+              <td><%=r.product_price %></td>
+              <td><%=r.product_unit %></td>
+               <td>
               <a href="javascript:deleteItem(<%= r.product_id%>)">
                 <i class="fa-solid fa-trash"></i>
               </a>

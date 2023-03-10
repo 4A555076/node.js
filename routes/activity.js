@@ -2,6 +2,7 @@ const express = require('express');
 const db = require('../modules/connect-mysql');
 const upload = require('../modules/upload-img');
 const moment = require('moment-timezone');
+const { route } = require('./member');
 
 const router = express.Router();
 
@@ -204,6 +205,73 @@ router.get("/activitydetail/:activity_id",async(req,res)=>{
     // const row = rows[0];
     res.json(rows[0]);
 });
+
+//活動報名
+router.post('/addForm', upload.none(), async(req, res)=>{ 
+    const output = {
+      success:false,
+      postData: req.body, //除錯用
+      code:0,
+      errors: {}
+    };
+  
+    console.log(output);
+    // return res.json(output)
+  
+   
+    let {mid, pets, activity_id} = req.body;
+    const sql = "INSERT INTO `activityform`(`activityform_time`, `mid`, `activity_id`, `pet_id`) VALUES (NOW(), ?, ?, ?)"
+    const [result] = await db.query(sql, [mid, activity_id, pets])
+  
+    output.result = result; 
+    output.success = !!result.affectedRows;
+  
+    res.json(output);
+  })
+
+//取得該會員的所有預約活動紀錄
+router.get("/activitysignupform/:mid",async(req,res)=>{
+    const output = {
+        success:false,
+        postData:req.body,
+        code:0,
+        errors:{},
+    };
+    const mid = +req.params.mid ||0;
+    if(!mid){
+        output.error.mid = '沒有資料編號';
+        return res.json(output);  //API不要用轉向
+    }
+    const sql = "SELECT activity.*,activityform.*,pet.*,member.* FROM activityform JOIN activity ON activityform.activity_id=activity.activity_id JOIN pet ON pet.pet_id=activityform.pet_id JOIN member ON member.mid=activityform.mid WHERE activityform.mid=?";
+    const [rows] = await db.query(sql,[mid]);
+    // if(rows.length<1){
+    //     return res.redirect(req.baseUrl); //轉向到列表頁
+    // }
+    // const row = rows[0];
+    res.json(rows);
+})
+
+//取得某一筆預約活動的明細
+router.get("/activitysignupformlist/:activityform_id",async(req,res)=>{
+    const output = {
+        success:false,
+        postData:req.body,
+        code:0,
+        errors:{},
+    };
+    const activityform_id = +req.params.activityform_id ||0;
+    if(!activityform_id){
+        output.error.activityform_id = '沒有資料編號';
+        return res.json(output);  //API不要用轉向
+    }
+    const sql = "SELECT activity.*,activityform.*,pet.*,member.* FROM activityform JOIN activity ON activityform.activity_id=activity.activity_id JOIN pet ON pet.pet_id=activityform.pet_id JOIN member ON member.mid=activityform.mid WHERE activityform.activityform_id=?";
+    const [rows] = await db.query(sql,[activityform_id]);
+    // if(rows.length<1){
+    //     return res.redirect(req.baseUrl); //轉向到列表頁
+    // }
+    // const row = rows[0];
+    res.json(rows[0]);
+})
 
 router.delete("/:activity_id",async(req,res)=>{
     const output = {
