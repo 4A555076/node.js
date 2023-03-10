@@ -19,8 +19,13 @@ const express = require('express');
 
 const app = express();
 
-app.set('view engine', 'ejs');
-//路由設定,routes
+const http = require("http");
+const { Server } = require("socket.io");
+
+
+
+
+
 
 const corsOptions = {
   credentials: true,
@@ -30,6 +35,36 @@ const corsOptions = {
   },
 };
 app.use(require('cors')(corsOptions));
+// const server = http.createServer(app);
+
+const io = new Server(3005, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
+});
+
+
+
+io.on("connection", (socket) => {
+  console.log(`User Connected: ${socket.id}`);
+
+  socket.on("join_room", (data) => {
+    socket.join(data);
+    console.log(`User with ID: ${socket.id} joined room: ${data}`);
+  });
+
+  socket.on("send_message", (data) => {
+    socket.to(data.room).emit("receive_message", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User Disconnected", socket.id);
+  });
+});
+
+app.set('view engine', 'ejs');
+//路由設定,routes
 
 //top-level middleware 
 //解析cookie，拿到sessionId，再把session資料放到req.session
@@ -267,11 +302,12 @@ app.post('/login', upload.none(), async (req, res) => {
   if (result) {
     output.success = true;
     output.id = row.mid;
+    output.name = row.name;
     //成功登入->設定session
     req.session.user = {
       id: row.mid,
       email,  //=>[email]
-      name: row.name
+      name: row.name,
     };
   } else {
     output.error = "密碼錯誤";
