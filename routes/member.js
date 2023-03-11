@@ -356,6 +356,14 @@ router.post('/toggle-like/:product_id', async (req, res)=>{
   res.json(output);
 });
 
+// 取得某個會員資料的api
+router.get('/:mid', async (req, res) => {
+  const mid = +req.params.mid || 0;
+  const sql = 'SELECT * FROM member WHERE mid=?';
+  const [result] = await db.query(sql, [mid])
+  res.json(result)
+})
+
 //透過會員編號找到會員各自的收藏名單
 router.get('/likes/:mid', async (req, res)=>{
   const output = {
