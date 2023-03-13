@@ -244,12 +244,12 @@ app.post("/auth/register", upload.none(), async (req, res) => {
   //   }
 })
 // 前端取得某個會員資料的api
-app.get('/member/:mid?', async (req, res) => {
-  const mid = +req.params.mid || 0;
-  const sql = 'SELECT * FROM member WHERE mid=?';
-  const [result] = await db.query(sql, [mid])
-  res.json(result)
-})
+// app.get('/member/:mid?', async (req, res) => {
+//   const mid = +req.params.mid || 0;
+//   const sql = 'SELECT * FROM member WHERE mid=?';
+//   const [result] = await db.query(sql, [mid])
+//   res.json(result)
+// })
 
 
 //新增會員資料
