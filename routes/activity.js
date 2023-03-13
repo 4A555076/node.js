@@ -41,10 +41,10 @@ const getListData = async(req,res)=>{
         where += `AND \`activity_name\` LIKE ${esc_search} `;
     }
 
-    let orderbySQL = 'ORDER BY activity_id ASC'; //預設值(編號升冪)
+    let orderbySQL = 'ORDER BY activity_id DESC'; //預設值(編號升冪)
   switch(orderby){
-    case 'activity_id_desc':
-      orderbySQL = 'ORDER BY activity_id DESC';
+    case 'activity_id_asc':
+      orderbySQL = 'ORDER BY activity_id ASC';
       break;
     case 'activity_datestart_asc':
       orderbySQL = 'ORDER BY activity_datestart ASC';
@@ -85,9 +85,7 @@ const getListData = async(req,res)=>{
 router.post("/upload-img",upload.array("images"),async(req,res)=>{
     res.json(req.files);
   });
-router.post("/upload-img",upload.array("images"),async(req,res)=>{
-res.json(req.files);
-});
+
 
 router.get("/add",async(req,res)=>{
     res.render("activity-add");
@@ -191,6 +189,12 @@ router.get("/api",async(req,res)=>{
       }
     res.json(output);
 });
+router.get("/activity-list/api",async(req,res)=>{
+    const sql = "SELECT * FROM activity ";
+    const [result] = await db.query(sql)
+    res.json(result);
+    
+});
 
 router.get("/activitydetail/:activity_id",async(req,res)=>{
     const output = {
@@ -201,7 +205,7 @@ router.get("/activitydetail/:activity_id",async(req,res)=>{
     };
     const activity_id = +req.params.activity_id ||0;
     if(!activity_id){
-        output.error.activity_id = '沒有資料編號';
+        output.errors.activity_id = '沒有資料編號';
         return res.json(output);  //API不要用轉向
     }
     const sql = "SELECT * FROM activity WHERE activity_id=?";
