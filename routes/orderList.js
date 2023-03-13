@@ -62,7 +62,7 @@ const getListData = async(req,res)=>{
             return res.redirect("?page="+totalPages);  //頁面轉向到最後一頁
         }
         // const sql = `SELECT * FROM products ${where} ${orderbySQL} LIMIT ${(page-1)*perPage},${perPage}`;
-        const sql = `SELECT od.* , od_detail.* FROM  od JOIN od_detail ON od.order_id=od_detail.order_id ${where} LIMIT ${(page-1)*perPage},${perPage}`;
+        const sql = `SELECT od.*  FROM  od  ${where} LIMIT ${(page-1)*perPage},${perPage} ` ;
         // SELECT activitypettype.* , activity.* FROM `activity` JOIN `activitypettype` ON activity.activity_pettype=activitypettype.activity_pettype WHERE activity_id=1;
         [rows] = await db.query(sql);
     }
@@ -105,59 +105,69 @@ const getListData = async(req,res)=>{
 // });
 
 
-// router.get("/edit/:order_id",async(req,res)=>{
+router.get("/edit/:order_id",async(req,res)=>{
 
-//     const order_id = +req.params.order_id ||0;
-//     if(!order_id){
-//         return res.redirect(req.baseUrl); //轉向到列表頁
-//     }
+    const order_id = +req.params.order_id ||0;
+    if(!order_id){
+        return res.redirect(req.baseUrl); //轉向到列表頁
+    }
 
-//     const sql = "SELECT * FROM od WHERE order_id=?";
-//     const [rows] = await db.query(sql,[order_id]);
-//     if(rows.length<1){
-//         return res.redirect(req.baseUrl); //轉向到列表頁
-//     }
-//     const row = rows[0];
-//     // res.json(row);
+    const sql = "SELECT * FROM od WHERE order_id=?";
+    const [rows] = await db.query(sql,[order_id]);
+    if(rows.length<1){
+        return res.redirect(req.baseUrl); //轉向到列表頁
+    }
+    const row = rows[0];
+    // res.json(row);
 
-//     //從哪裡來
-//     const referer = req.get('Referer') || req.baseUrl;
+    //從哪裡來
+    const referer = req.get('Referer') || req.baseUrl;
     
-//     res.render("order-edit",{...row,referer});
-// });
+    res.render("order-edit",{...row,referer});
+});
 
-// router.put("/edit/:order_id",upload.none(),async(req,res)=>{
-//     // return res.json(req.body);
+router.put("/edit/:order_id",upload.none(),async(req,res)=>{
+    // return res.json(req.body);
 
-//     const output = {
-//         success:false,
-//         postData:req.body,
-//         code:0,
-//         errors:{},
-//     };
+    const output = {
+        success:false,
+        postData:req.body,
+        code:0,
+        errors:{},
+    };
 
-//     const order_id = +req.params.order_id ||0;
-//     if(!order_id){
-//         output.error.order_id = '沒有資料編號';
-//         return res.json(output);  //API不要用轉向
-//     }
+    console.log(output);
+    // return res.json(output);
 
-//     const {member_id, order_date, status, recipient_name, recipient_address, recipient_phone} = req.body;
 
-//     if(!status || recipient_name.length<1 || recipient_address.length<2 || recipient_phone.length<10){
-//         output.errors.recipient_name = '請輸入正確的客戶姓名';
-//         return res.json(output);
-//     }
+    const order_id = +req.params.order_id ||0;
+    if(!order_id){
+        output.errors.order_id = '沒有訂單資料編號';
+        return res.json(output);  //API不要用轉向
+    }
 
-//     const sql = "UPDATE `od` SET `status`=?,`recipient_name`=?,`recipient_address`=?,`recipient_phone`=? WHERE `order_id`=?";
+    const {member_id, order_date, status,name:recipient_name, address:recipient_address, mobile:recipient_phone} = req.body;
 
-//     const [result] = await db.query(sql,[status, recipient_name, recipient_address, recipient_phone,order_id])
+    // if(!status || recipient_name.length<1 || !recipient_address || recipient_phone){
+    if(!status || !recipient_name || recipient_name.length<2 || !recipient_address || recipient_address.length < 2 || !recipient_phone || recipient_phone<10){
+        output.errors.recipient_name = '請輸入正確的客戶姓名';
+        output.errors.recipient_address = '請輸入正確的客戶地址';
+        output.errors.recipient_phone = '請輸入正確的客戶電話';
+        return res.json(output);
+    }
 
-//     output.result = result;
-//     output.success = !! result.changedRows;
+    console.log(output);
+    const sql = "UPDATE `od` SET `status`=?,`recipient_name`=?,`recipient_address`=?,`recipient_phone`=? WHERE `order_id`=?";
+    // const sql = "UPDATE `od` SET `status`=? WHERE `order_id`=?";
 
-//     res.json(output);
-// });
+    const [result] = await db.query(sql,[status, recipient_name, recipient_address, recipient_phone,order_id])
+
+    output.result = result;
+    output.success = !! result.changedRows;
+    console.log(result);
+
+    res.json(output);
+});
 
 // 取得該會員的所有訂單紀錄
 router.get("/order/:member_id",async(req,res)=>{
@@ -194,7 +204,7 @@ router.get('/orderDetail/:order_id',async(req,res)=>{
         output.error.order_id = '沒有資料編號';
         return res.json(output);  //API不要用轉向
     }
-    const sql = "SELECT od_detail.*, product.*, od.order_date, od.recipient_name, od.recipient_address, od.recipient_phone, od.payment_method FROM od_detail JOIN od ON od.order_id = od_detail.order_id JOIN product ON product.product_id = od_detail.product_id WHERE od_detail.order_id = ?";
+    const sql = "SELECT od_detail.*, product.*, od.order_date, od.recipient_name, od.recipient_address, od.recipient_phone, od.status, od.payment_method FROM od_detail JOIN od ON od.order_id = od_detail.order_id JOIN product ON product.product_id = od_detail.product_id WHERE od_detail.order_id = ?";
     const [rows] = await db.query(sql,[order_id]);
 
     if(rows.length<1){
