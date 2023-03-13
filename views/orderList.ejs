@@ -48,12 +48,12 @@
               <td><%=r.recipient_address %></td>
               <td><%=r.recipient_phone %></td>
                <td>
-              <a href="javascript:deleteItem(<%= r.product_id%>)">
+              <a href="javascript:deleteItem(<%= r.order_id%>)">
                 <i class="fa-solid fa-trash"></i>
               </a>
             </td>
             <td>
-              <a href="<%= baseUrl %>/edit/<%= r.product_id %>">
+              <a href="<%= baseUrl %>/edit/<%= r.order_id %>">
                 <i class="fa-solid fa-pen-to-square"></i>
               </a>
             </td>
