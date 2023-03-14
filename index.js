@@ -461,6 +461,7 @@ app.post('/order/:mid', async (req, res) => {
   try {
     // 取得Detail裡的type_id
     const detailId = aid
+
     const {start_time,end_time,additional}=req.body;
     
     // 判斷是否新增Validity Period資料表
@@ -471,6 +472,7 @@ app.post('/order/:mid', async (req, res) => {
       const addValidityPeriodSql = 'INSERT INTO validity_period(order_detail_id, start_time,end_time, additional) VALUES (?,?,?,?)'
       const [addValidityPeriodResult] = await db.query(addValidityPeriodSql, [detailId, start_time, end_time, additional])
       return res.json({ success: true, message: 'validity_period added successfully', detailId });
+
     } else {
       throw new Error("TypeID is undefined");
     }
