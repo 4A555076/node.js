@@ -464,10 +464,10 @@ app.post('/order/:mid', async (req, res) => {
     const {start_time,end_time,additional}=req.body;
     
     // 判斷是否新增Validity Period資料表
-    if (tid == 1 || tid == 2) {
+    if (tid == 1 || tid == 2|| tid == 4) {
       //return addDetailResult;
       return res.json({ success: true, message: 'Order details added successfully', order_id });
-    } else if (tid == 3 || tid == 4) {
+    } else if (tid == 3) {
       const addValidityPeriodSql = 'INSERT INTO validity_period(order_detail_id, start_time,end_time, additional) VALUES (?,?,?,?)'
       const [addValidityPeriodResult] = await db.query(addValidityPeriodSql, [detailId, start_time, end_time, additional])
       return res.json({ success: true, message: 'validity_period added successfully', detailId });
