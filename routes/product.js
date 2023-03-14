@@ -71,8 +71,10 @@ const getListData = async (req, res) => {
 router.get("/add", async (req, res) => {
     res.render("product-add");
 });
-
-router.post("/add", upload.single("product_image"), async (req, res) => {
+router.post("/upload-img",upload.array("images"),async(req,res)=>{
+    res.json(req.files);
+  });
+router.post("/add",upload.single("product_image"),async(req,res)=>{
 
     const output = {
         success: false,
@@ -80,9 +82,9 @@ router.post("/add", upload.single("product_image"), async (req, res) => {
         code: 0,
         errors: {},
     };
-    let { filename: product_image } = req.file;
+    // let {filename: product_image}=req.file;
 
-    let { product_type, product_name, product_class, product_price, product_descripttion, product_unit } = req.body;
+    let {product_type,product_name, product_class,product_price,product_descripttion,product_unit,product_image} = req.body;
 
     if (!product_name || product_name.length < 1) {
         output.errors.product_name = '請輸入正確的商品名稱';

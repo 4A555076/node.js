@@ -43,10 +43,20 @@
               <div class="form-text"></div>
             </div>
             <div class="mb-3">
+              <textarea type="text" name="product_image" cols="70"></textarea>
+              <br>
               <label for="product_image" class="product_image">選擇圖片</label>
-              <input type="file" class="form-control" id="product_image" name="product_image">
+              <button type="button" onclick="selectFileBtn.click()">選擇圖片</button>
+
+
             </div>  
-            <button type="submit" class="btn btn-primary">送出</button>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <input type="button" class="btn btn-primary me-md-2" onclick="history.back();" value="返回">
+              <button type="submit" class="btn btn-primary">送出</button>
+            </div>
+          </form>
+          <form name="uploadForm" style="display:none">
+            <input type="file" class="form-control" id="selectFileBtn" name="images" multiple="multiple">
           </form>
         </div>
       </div>
@@ -56,6 +66,31 @@
 
 <%- include('parts/scripts') %>
 <script>
+  const uploadForm = document.uploadForm;
+  const selectFileBtn = document.querySelector('#selectFileBtn');
+
+  selectFileBtn.onchange = (e)=>{
+    const fd = new FormData(uploadForm);
+
+    fetch('/product/upload-img',{
+      method: 'POST',
+      body: fd
+    }).then(r=>r.json())
+    .then(ar=>{
+      let ori = document.form1.product_image.value;
+      ori = ori.split(',');
+
+      ar.forEach(f=>{
+        ori.push(f.filename);
+      })
+
+      document.form1.product_image.value = ori.join(',');
+
+    })
+
+  }
+
+
   function postForm(event){
     event.preventDefault();
 
