@@ -50,7 +50,11 @@ const getListData = async (req, res) => {
 
     const perPage = 5;
     const t_sql = `SELECT COUNT(1) totalRows FROM product ${where}`;
+
+
     const [[{ totalRows }]] = await db.query(t_sql);
+
+
 
     const totalPages = Math.ceil(totalRows / perPage);
 
@@ -60,7 +64,11 @@ const getListData = async (req, res) => {
             return res.redirect("?page=" + totalPages);  //頁面轉向到最後一頁
         }
 
+
+
         const sql = `SELECT product_type.* , product.* FROM  product JOIN product_type ON product.product_type=product_type.type_id ${where} ${orderbySQL} LIMIT ${(page - 1) * perPage},${perPage}`;
+
+
         [rows] = await db.query(sql);
     }
 
@@ -84,7 +92,11 @@ router.post("/add",upload.single("product_image"),async(req,res)=>{
     };
     // let {filename: product_image}=req.file;
 
+
+
     let {product_type,product_name, product_class,product_price,product_descripttion,product_unit,product_image} = req.body;
+
+
 
     if (!product_name || product_name.length < 1) {
         output.errors.product_name = '請輸入正確的商品名稱';
@@ -93,7 +105,11 @@ router.post("/add",upload.single("product_image"),async(req,res)=>{
 
     const sql = "INSERT INTO `product`(`product_type`,`product_name`, `product_class`,`product_price`,`product_descripttion`,`product_unit`,`product_image`) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
+
+
     const [result] = await db.query(sql, [product_type, product_name, product_class, product_price, product_descripttion, product_unit, product_image]);
+
+
 
     output.result = result;
     output.success = !!result.affectedRows;
@@ -109,8 +125,12 @@ router.get("/edit/:product_id", async (req, res) => {
     }
 
     const sql = "SELECT * FROM product WHERE product_id=?";
+
+
     const [rows] = await db.query(sql, [product_id]);
     if (rows.length < 1) {
+
+
         return res.redirect(req.baseUrl); //轉向到列表頁
     }
     const row = rows[0];
@@ -138,8 +158,11 @@ router.put("/edit/:product_id", upload.single("product_image"), async (req, res)
         return res.json(output);  //API不要用轉向
     }
 
+
     const { product_type, product_name, product_class, product_price, product_descripttion, product_unit } = req.body;
     const { filename: product_image } = req.file;
+
+
 
     if (!product_name || product_name.length < 1) {
         output.errors.product_name = '請輸入正確的商品名稱';
@@ -150,7 +173,11 @@ router.put("/edit/:product_id", upload.single("product_image"), async (req, res)
 
     const sql = "UPDATE `product` SET `product_type`=?,`product_name`=?,`product_class`=?,`product_price`=?,`product_descripttion`=?,`product_unit`=?,`product_image`=? WHERE `product_id`=?";
 
+
+
     const [result] = await db.query(sql, [product_type, product_name, product_class, product_price, product_descripttion, product_unit, product_image, product_id])
+
+
 
     output.result = result;
     output.success = !!result.changedRows;
@@ -176,7 +203,11 @@ router.get("/list-product/:product_type", async (req, res) => {
     }
 
     const sql = "SELECT * FROM product WHERE product_type=?";
+
+
     const [rows] = await db.query(sql, [product_type]);
+
+
     res.json(rows);
 
 })
@@ -189,7 +220,11 @@ router.get("/list-detail/:product_id", async (req, res) => {
     }
 
     const sql = "SELECT * FROM product WHERE product_id=?";
+
+
     const [rows] = await db.query(sql, [product_id]);
+
+
     res.json(rows);
 
 })
@@ -206,7 +241,11 @@ router.delete("/:product_id", async (req, res) => {
         return res.json(output);
     }
     const sql = "DELETE FROM `product` WHERE product_id=?";
+
+
     const [result] = await db.query(sql, [product_id]);
+
+
 
     output.success = !!result.affectedRows;
     res.json(output);

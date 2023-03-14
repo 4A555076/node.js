@@ -19,8 +19,13 @@ const express = require('express');
 
 const app = express();
 
-app.set('view engine', 'ejs');
-//路由設定,routes
+const http = require("http");
+const { Server } = require("socket.io");
+
+
+
+
+
 
 const corsOptions = {
   credentials: true,
@@ -30,6 +35,36 @@ const corsOptions = {
   },
 };
 app.use(require('cors')(corsOptions));
+// const server = http.createServer(app);
+
+const io = new Server(3005, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
+});
+
+
+
+io.on("connection", (socket) => {
+  console.log(`User Connected: ${socket.id}`);
+
+  socket.on("join_room", (data) => {
+    socket.join(data);
+    console.log(`User with ID: ${socket.id} joined room: ${data}`);
+  });
+
+  socket.on("send_message", (data) => {
+    socket.to(data.room).emit("receive_message", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User Disconnected", socket.id);
+  });
+});
+
+app.set('view engine', 'ejs');
+//路由設定,routes
 
 //top-level middleware 
 //解析cookie，拿到sessionId，再把session資料放到req.session
@@ -209,12 +244,12 @@ app.post("/auth/register", upload.none(), async (req, res) => {
   //   }
 })
 // 前端取得某個會員資料的api
-app.get('/member/:mid?', async (req, res) => {
-  const mid = +req.params.mid || 0;
-  const sql = 'SELECT * FROM member WHERE mid=?';
-  const [result] = await db.query(sql, [mid])
-  res.json(result)
-})
+// app.get('/member/:mid?', async (req, res) => {
+//   const mid = +req.params.mid || 0;
+//   const sql = 'SELECT * FROM member WHERE mid=?';
+//   const [result] = await db.query(sql, [mid])
+//   res.json(result)
+// })
 
 
 //新增會員資料
@@ -267,11 +302,12 @@ app.post('/login', upload.none(), async (req, res) => {
   if (result) {
     output.success = true;
     output.id = row.mid;
+    output.name = row.name;
     //成功登入->設定session
     req.session.user = {
       id: row.mid,
       email,  //=>[email]
-      name: row.name
+      name: row.name,
     };
   } else {
     output.error = "密碼錯誤";
@@ -425,14 +461,18 @@ app.post('/order/:mid', async (req, res) => {
   try {
     // 取得Detail裡的type_id
     const detailId = aid
+
+    const {start_time,end_time,additional}=req.body;
+    
     // 判斷是否新增Validity Period資料表
-    if (tid == 1 || 2) {
+    if (tid == 1 || tid == 2|| tid == 4) {
       //return addDetailResult;
       return res.json({ success: true, message: 'Order details added successfully', order_id });
-    } else if (tid == 3 || 4) {
+    } else if (tid == 3) {
       const addValidityPeriodSql = 'INSERT INTO validity_period(order_detail_id, start_time,end_time, additional) VALUES (?,?,?,?)'
       const [addValidityPeriodResult] = await db.query(addValidityPeriodSql, [detailId, start_time, end_time, additional])
-      return addValidityPeriodResult;
+      return res.json({ success: true, message: 'validity_period added successfully', detailId });
+
     } else {
       throw new Error("TypeID is undefined");
     }
