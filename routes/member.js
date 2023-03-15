@@ -148,35 +148,35 @@ router.get('/addPet/:mid', async(req, res)=>{
   res.render('admin-addPet');
 });
 
-router.post('/addPet/:mid', upload.none(), async(req, res)=>{ 
-  const output = {
-    success:false,
-    postData: req.body, //除錯用
-    code:0,
-    errors: {}
-  };
+// router.post('/addPet/:mid', upload.none(), async(req, res)=>{ 
+//   const output = {
+//     success:false,
+//     postData: req.body, //除錯用
+//     code:0,
+//     errors: {}
+//   };
 
-  let {name,type,birthday,gender}=req.body; //解構
+//   let {name,type,birthday,gender}=req.body; //解構
 
-  if(!name || name.length<2 ){
-    output.errors.name='請輸入正確的姓名';
-    return res.json(output);   //輸出，但後面不執行時->加return
-  }
+//   if(!name || name.length<2 ){
+//     output.errors.name='請輸入正確的姓名';
+//     return res.json(output);   //輸出，但後面不執行時->加return
+//   }
   
-  birthday = moment(birthday);
-  birthday = birthday.isValid() ? birthday.format('YYYY-MM-DD') : null;   //如果格式錯誤，填空值
+//   birthday = moment(birthday);
+//   birthday = birthday.isValid() ? birthday.format('YYYY-MM-DD') : null;   //如果格式錯誤，填空值
 
-  //TODO: 資料檢查
-    const sql = "INSERT INTO `pet`(`name`, `birthday`, `type`, `gender`,`mid`)VALUES(?, ?, ?, ?, ?)";
-  const [result] = await db.query(sql, [name, birthday, type, gender, req.params.mid]);
+//   //TODO: 資料檢查
+//     const sql = "INSERT INTO `pet`(`name`, `birthday`, `type`, `gender`,`mid`)VALUES(?, ?, ?, ?, ?)";
+//   const [result] = await db.query(sql, [name, birthday, type, gender, req.params.mid]);
 
-  output.result = result; 
-  output.success = !!result.affectedRows; //轉成boolean (affectedRows 1 : true ; affectedRows 0 :false )
+//   output.result = result; 
+//   output.success = !!result.affectedRows; //轉成boolean (affectedRows 1 : true ; affectedRows 0 :false )
   
-  //affectedRows
-  res.json(output);   //=>結束，所以不須加return                   
-  //upload.none()->不要上傳，但需要middleware幫忙解析資料
-});
+//   //affectedRows
+//   res.json(output);   //=>結束，所以不須加return                   
+//   //upload.none()->不要上傳，但需要middleware幫忙解析資料
+// });
 
 //編輯會員api
 router.get('/edit/:mid', async(req, res)=>{ 
@@ -425,6 +425,53 @@ router.get('/api', async(req, res)=>{
   //TODO: 用output.rows.forEach()再寫一次功能
   res.json(output); //拿到路由-> 轉成json
 });
+
+//查看每位會員的各自寵物資訊
+router.get('/pet/:mid', async(req, res)=>{ 
+  const mid = +req.params.mid || 0; //轉換成數值
+  if(!mid){
+    return res.redirect(req.baseUrl); //呈現表單-> 轉向列表頁(不要用json)
+  }
+  const sql ="SELECT pet.* , member.* FROM pet JOIN member ON pet.mid=member.mid WHERE pet.mid=?";
+  const [rows] = await db.query(sql,[mid]);
+  if(rows.length<1){
+    return res.redirect(req.baseUrl); //轉向列表頁
+  }
+  const referer = req.get('Referer') || req.baseUrl; //若沒有值->回到baseUrl ->第一頁
+  // res.render('pet-list', {rows, referer});  //展開->name、birthday..這些變數
+  res.json(rows); 
+});
+
+//新增寵物api
+router.post('/addPet/:mid', upload.none(), async(req, res)=>{ 
+  const output = {
+    success:false,
+    postData: req.body, //除錯用
+    code:0,
+    errors: {}
+  };
+
+  console.log(output)
+
+  let {name: pet_name, type: pet_type, gender: pet_gender, activity_id: activity_id}=req.body; //解構
+
+  if(!pet_name || pet_name.length<1 ){
+    output.errors.name='請輸入正確的姓名';
+    return res.json(output);   //輸出，但後面不執行時->加return
+  }
+  
+
+  //TODO: 資料檢查
+  const sql = "INSERT INTO `pet`(`pet_name`, `pet_type`, `pet_gender`,`mid`)VALUES(?, ?, ?, ?)";
+  const [result] = await db.query(sql, [pet_name, pet_type, pet_gender, req.params.mid]);
+
+  output.result1 = result; 
+  output.success1 = !!result.affectedRows; //轉成boolean (affectedRows 1 : true ; affectedRows 0 :false )
+
+  //affectedRows
+  res.json(output);   //=>結束，所以不須加return                   
+});
+
 
 //刪除會員api
 router.delete('/:mid', async(req, res)=>{ 
