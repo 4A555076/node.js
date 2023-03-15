@@ -100,7 +100,7 @@
     }).then(r=>r.json())
     .then(ar=>{
       let ori = document.form1.activity_image.value;
-      ori = ori.split(',');
+      ori = ori.split('');
 
       ar.forEach(f=>{
         ori.push(f.filename);
