@@ -204,7 +204,8 @@ router.get('/orderDetail/:order_id',async(req,res)=>{
         output.error.order_id = '沒有資料編號';
         return res.json(output);  //API不要用轉向
     }
-    const sql = "SELECT od_detail.*, product.*, od.order_date, od.recipient_name, od.recipient_address, od.recipient_phone, od.status, od.payment_method FROM od_detail JOIN od ON od.order_id = od_detail.order_id JOIN product ON product.product_id = od_detail.product_id WHERE od_detail.order_id = ?";
+    
+    const sql = "SELECT od_detail.*, validity_period.*, product.*, od.order_date, od.recipient_name, od.recipient_address, od.recipient_phone, od.status, od.payment_method FROM od_detail JOIN od ON od.order_id = od_detail.order_id JOIN product ON product.product_id = od_detail.product_id LEFT JOIN validity_period ON validity_period.order_detail_id=od_detail.order_detail_id WHERE od_detail.order_id =?";
     const [rows] = await db.query(sql,[order_id]);
 
     if(rows.length<1){
