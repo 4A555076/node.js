@@ -4,12 +4,7 @@
 <div class="container">
     <div class="row justify-content-end">
       <div class="col-4">
-          <a class="nav-link" href="/activity/add">新增活動資料
-            <i class="fa-solid fa-plus"></i>
-          </a>
-      </div>
-      <div class="col-4">
-        <select class="form-select" id="orderby" onchange="changeParams()">
+        <select class="form-select rounded-pill" id="orderby" onchange="changeParams()">
           <option value="activity_id_desc">預設(編號降冪)</option>
           <option value="activity_id_asc">編號升冪</option>
           <option value="activity_datestart_asc">活動日期升冪</option>
@@ -20,14 +15,19 @@
       </div>
       <div class="col-4">
         <form class="d-flex" role="search" onsubmit="changeParams(event)">
-          <input class="form-control me-2" type="search" name="search" placeholder="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
+          <input class="form-control me-2 rounded-pill" type="search" name="search" placeholder="Search">
+          <button class="btn btn-outline-success rounded-circle bg-success-subtle" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
         </form>
       </div>
     </div>
-    <div class="row">
-      <div class="col">
-        <table class="table table-bordered table-striped">
+    <div>
+      <a class="nav-link" href="/activity/add">新增活動資料
+        <i class="fa-solid fa-plus"></i>
+      </a>
+    </div>
+    <div class="row ">
+      <div class="col ">
+        <table class="table table-bordered table-striped bg-light-subtle mt-3 mb-3">
           <thead>
             <tr>
               <th scope="col">活動編號</th>
@@ -53,7 +53,7 @@
               <td><%=r.activity_location %></td>
                <td>
               <a href="javascript:deleteItem(<%= r.activity_id%>)">
-                <i class="fa-solid fa-trash"></i>
+                <i class="fa-solid fa-trash" style="color:red"></i>
               </a>
             </td>
             <td>
@@ -96,6 +96,8 @@
     </div>
   </div>
 </div>
+</div>
+
 
 <%- include('parts/scripts') %>
 <script>
