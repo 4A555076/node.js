@@ -489,14 +489,33 @@ app.use('/member', require('./routes/member'));
 app.use('/orderList', require('./routes/orderList'));
 app.use('/activity', require('./routes/activity'));
 app.use('/product', require('./routes/product'));
-app.use('/room', require('./routes/room'));
+app.use('/room',require('./routes/room'));
+app.use('/meals',require('./routes/meals'));
 // 前端讀取圖片時使用的URL
 app.use('/uploads/:fileName?', express.static(__dirname + '/public/uploads'));
 
 app.use(express.static('public/uploads'));
+//搜尋資料庫的課程商品並顯示到前端的API
+app.get("/courses", async(req, res) => {
+  const [rows]=await  db.query("SELECT * FROM product WHERE product_type=4");
+   
+   res.json(rows);
+    });
 
-
-
+//按照課程主題分類分別顯示相關課程的API
+app.get("/meals:class", async(req, res) => {
+      const param=req.params.class;
+      const [rows]=await  db.query(`SELECT * FROM product WHERE product_class=${param}`);
+       
+       res.json(rows);
+        });
+//找單堂課的API
+app.get("/mealss:name", async(req, res) => {
+          const param=req.params.name;
+          const [rows]=await  db.query(`SELECT * FROM product WHERE product_name=${param}`);
+           
+           res.json(rows);
+            });
 
 //*****所有路由設定都要放在這行之前*****
 app.use((req, res) => {
