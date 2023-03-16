@@ -7,7 +7,7 @@
 node_modules/
 dist/
 upload_tmp/
-public/uploads/
+# public/uploads/
 
 /public/fontawesome-free-6.2.0-web
 
