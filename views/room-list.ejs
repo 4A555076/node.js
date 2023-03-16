@@ -42,18 +42,8 @@
             <!--這邊不輸出，所以不加-或=-->
             <tr>
               <td><%=r.product_id %></td>
-              <td>
-                <%=r.product_type==1 ? '商品' : r.product_type==2 ? '課程' :
-                r.product_type==3 ? '住宿' : r.product_type==4 ? '餐點' : '活動'
-                %>
-              </td>
-              <td>
-                <img
-                  src="/<%= r.product_image %>"
-                  width="200"
-                  class="product_image"
-                />
-              </td>
+              <td><%=r.product_type==1 ? '商品' : r.product_type==2 ? '課程' : r.product_type==3 ? '住宿' : r.product_type==4 ? '餐點' : '活動'  %></td>
+              <td><img src="/uploads/<%= (r.product_image).split(',')[0] %>" width="200" class="product_image"></td>
               <td><%=r.product_name %></td>
               <td><%=r.product_class %></td>
               <td><%=r.product_price %></td>

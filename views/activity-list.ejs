@@ -45,7 +45,7 @@
             <% for(let r of rows){ %>  <!--這邊不輸出，所以不加-或=-->
             <tr>
               <td><%=r.activity_id %></td>
-              <td><img src="/<%= r.activity_image %>" width="200" class="activity_image"></td>
+              <td><img src="/uploads/<%= (r.activity_image).split(',')[0] %>" width="200" class="activity_image"></td>
               <td><%=r.activity_name %></td>
               <td><%=toDateString(r.activity_datestart) %></td>
               <td><%=toDateString(r.activity_dateend) %></td>

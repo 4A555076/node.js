@@ -2,7 +2,7 @@
 <%- include('parts/navbar') %>
 
 <div class="container">
-  <div class="row">
+  <div class="row row justify-content-center align-items-center">
     <div class="col-6">
       <div class="card" >
         <div class="card-body">
@@ -43,7 +43,7 @@
               <div class="form-text"></div>
             </div>
             <div class="mb-3">
-              <textarea type="text" name="product_image" readonly cols="80"><%= product_image %></textarea>
+              <textarea class="form-control" type="text" name="product_image" readonly cols="30" rows="3"><%= product_image %></textarea>
               <br>
               <label for="product_image" class="product_image">選擇圖片</label>
               <button type="button" onclick="selectFileBtn.click()">選擇圖片</button>
