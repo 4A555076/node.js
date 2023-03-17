@@ -79,10 +79,11 @@ const getListData = async (req, res) => {
 router.get("/add", async (req, res) => {
     res.render("product-add");
 });
-router.post("/upload-img",upload.array("images"),async(req,res)=>{
+router.post("/upload-img", upload.array("images"), async (req, res) => {
     res.json(req.files);
-  });
-router.post("/add",upload.single("product_image"),async(req,res)=>{
+});
+
+router.post("/add", upload.single("product_image"), async (req, res) => {
 
     const output = {
         success: false,
@@ -94,7 +95,7 @@ router.post("/add",upload.single("product_image"),async(req,res)=>{
 
 
 
-    let {product_type,product_name, product_class,product_price,product_descripttion,product_unit,product_image} = req.body;
+    let { product_type, product_name, product_class, product_price, product_descripttion, product_unit, product_image } = req.body;
 
 
 
