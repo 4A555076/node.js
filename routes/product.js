@@ -160,8 +160,8 @@ router.put("/edit/:product_id", upload.single("product_image"), async (req, res)
     }
 
 
-    const { product_type, product_name, product_class, product_price, product_descripttion, product_unit } = req.body;
-    const { filename: product_image } = req.file;
+    const { product_type, product_name, product_class, product_price, product_descripttion, product_unit, product_image } = req.body;
+    // const { filename: product_image } = req.file;
 
 
 
